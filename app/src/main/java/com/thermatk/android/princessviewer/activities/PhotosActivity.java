@@ -39,6 +39,7 @@ public class PhotosActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeContainer;
     private Context mContext;
     private boolean moreAvailable;
+    private String user = "katekoti";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +89,7 @@ public class PhotosActivity extends AppCompatActivity {
         aPhotos.notifyItemInserted(photos.size() - 1);
 
         // do the network request
-        String popularUrl = "https://www.instagram.com/katekoti/media/";
+        String popularUrl = "https://www.instagram.com/" +user+ "/media/";
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(popularUrl, new JsonHttpResponseHandler() {
             // define success and failure callbacks
@@ -128,7 +129,7 @@ public class PhotosActivity extends AppCompatActivity {
     private void fetchPhotosAdditional(String maxId) {
 
         // do the network request
-        String popularUrl = "https://www.instagram.com/katekoti/media/?max_id="+maxId;
+        String popularUrl = "https://www.instagram.com/" +user+ "/media/?max_id="+maxId;
         Log.d("katyagram" , popularUrl);
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(popularUrl, new JsonHttpResponseHandler() {
