@@ -4,12 +4,11 @@ public class Comment {
     public String profileUrl;
     public String username;
     public String text;
-    public String createdTime;
+    public Long createdTime;
 
     public String getRelativeTime() {
-        long ct = Long.parseLong(createdTime);
         long now = System.currentTimeMillis() / 1000;
-        long elapsedSeconds = now - ct;
+        long elapsedSeconds = now - createdTime;
 
         if (elapsedSeconds < 60) { // less than a minute
             return String.format(elapsedSeconds == 1 ? "%.0f second ago" : "%.0f seconds ago", elapsedSeconds);
