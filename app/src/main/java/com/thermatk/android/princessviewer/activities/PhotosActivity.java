@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -38,7 +37,7 @@ public class PhotosActivity extends AppCompatActivity {
     private PhotosAdapter aPhotos;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipeContainer;
-    Context mContext;
+    private Context mContext;
     private boolean moreAvailable;
 
     @Override
@@ -217,7 +216,7 @@ public class PhotosActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
             if (holder instanceof PhotoViewHolder) {
                 InstagramPhoto photo = photos.get(position);
 
@@ -235,7 +234,7 @@ public class PhotosActivity extends AppCompatActivity {
                 } else {
                     photoViewHolder.tvCaption.setVisibility(View.GONE);
                 }
-
+                final int curPos = position;
                 if (photo.commentsCount > 0) {
                     photoViewHolder.tvViewAllComments.setText(String.format("показать все комментарии(%d)", photo.commentsCount));
                     // set click handler for view all comments
@@ -244,7 +243,7 @@ public class PhotosActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             Intent intent = new Intent(mContext, CommentsActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            InstagramPhoto photo = photos.get(position);
+                            InstagramPhoto photo = photos.get(curPos);
                             intent.putExtra("code", photo.code);
                             mContext.startActivity(intent);
                         }
