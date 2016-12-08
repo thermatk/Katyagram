@@ -10,10 +10,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.thermatk.android.princessviewer.data.Comment;
 
 import java.util.List;
 
-class CommentsAdapter extends ArrayAdapter<Comment> {
+public class CommentsAdapter extends ArrayAdapter<Comment> {
     public CommentsAdapter(Context context, List<Comment> comments) {
         super(context, android.R.layout.simple_list_item_1, comments);
     }

@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer;
+package com.thermatk.android.princessviewer.activities;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
@@ -7,6 +7,9 @@ import android.widget.ListView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.thermatk.android.princessviewer.InstagramPhotosAdapter;
+import com.thermatk.android.princessviewer.R;
+import com.thermatk.android.princessviewer.data.InstagramPhoto;
 
 import cz.msebera.android.httpclient.Header;
 import org.json.JSONArray;

@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.thermatk.android.princessviewer.PhotosActivity"
+            android:name="com.thermatk.android.princessviewer.activities.PhotosActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
@@ -20,12 +20,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.thermatk.android.princessviewer.CommentsActivity"
+            android:name="com.thermatk.android.princessviewer.activities.CommentsActivity"
             android:label="@string/comments_caption"
-            android:parentActivityName="com.thermatk.android.princessviewer.PhotosActivity" >
+            android:parentActivityName="com.thermatk.android.princessviewer.activities.PhotosActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.thermatk.android.princessviewer.PhotosActivity" />
+                android:value="com.thermatk.android.princessviewer.activities.PhotosActivity" />
         </activity>
     </application>
 

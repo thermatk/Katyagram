@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer;
+package com.thermatk.android.princessviewer.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +7,9 @@ import android.widget.ListView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.thermatk.android.princessviewer.CommentsAdapter;
+import com.thermatk.android.princessviewer.R;
+import com.thermatk.android.princessviewer.data.Comment;
 
 import cz.msebera.android.httpclient.Header;
 import org.json.JSONArray;

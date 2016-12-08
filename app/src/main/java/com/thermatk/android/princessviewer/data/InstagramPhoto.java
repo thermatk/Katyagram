@@ -1,6 +1,6 @@
-package com.thermatk.android.princessviewer;
+package com.thermatk.android.princessviewer.data;
 
-class InstagramPhoto {
+public class InstagramPhoto {
     public String username;
     public String caption;
     public String createdTime;

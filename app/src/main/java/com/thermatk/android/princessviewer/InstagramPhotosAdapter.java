@@ -12,10 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.thermatk.android.princessviewer.activities.CommentsActivity;
+import com.thermatk.android.princessviewer.data.InstagramPhoto;
 
 import java.util.List;
 
-class InstagramPhotosAdapter extends ArrayAdapter<InstagramPhoto> {
+public class InstagramPhotosAdapter extends ArrayAdapter<InstagramPhoto> {
     public InstagramPhotosAdapter(Context context, List<InstagramPhoto> photos) {
         super(context, android.R.layout.simple_list_item_1, photos);
     }
