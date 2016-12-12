@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -227,7 +228,13 @@ public class PhotosActivity extends AppCompatActivity {
 
                 // Populate the subviews (textfield, imageview) with the correct data
                 photoViewHolder.tvUsername.setText(photo.username);
-                photoViewHolder.tvTime.setText(photo.getRelativeTime());
+                //photoViewHolder.tvTime.setText(photo.getRelativeTime());
+                photoViewHolder.tvTime.setText(
+                        DateUtils.getRelativeTimeSpanString(
+                                Long.parseLong(photo.createdTime)*1000,
+                                System.currentTimeMillis(),
+                                DateUtils.DAY_IN_MILLIS,
+                                DateUtils.FORMAT_ABBREV_RELATIVE));
                 photoViewHolder.tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.likesCount));
                 if (photo.caption != null) {
                     photoViewHolder.tvCaption.setText(Html.fromHtml("<font color='#3f729b'><b>" + photo.username + "</b></font> " + photo.caption));
