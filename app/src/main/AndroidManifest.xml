@@ -21,7 +21,7 @@
         </activity>
         <activity
             android:name="com.thermatk.android.princessviewer.activities.CommentsActivity"
-            android:label="@string/comments_caption"
+            android:label="tmp"
             android:parentActivityName="com.thermatk.android.princessviewer.activities.PhotosActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

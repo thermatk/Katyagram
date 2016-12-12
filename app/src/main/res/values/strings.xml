@@ -4,10 +4,9 @@
     <string name="app_name">Katyagram</string>
     <string name="username_default_text">username</string>
     <string name="time_default_text">time</string>
-    <string name="like_default_text">лайков</string>
-    <string name="caption_default_text">This is a default caption</string>
+    <string name="like_default_text">likes</string>
+    <string name="caption_default_text">default caption</string>
     <string name="comment_1_default_text">comment 1</string>
     <string name="comment_2_default_text">comment 2</string>
-    <string name="view_all_comments_default_text">Смотреть все комментарии</string>
-    <string name="comments_caption">НЕГОТОВО</string>
+    <string name="view_all_comments_default_text">view all comments</string>
 </resources>

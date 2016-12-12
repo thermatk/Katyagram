@@ -21,7 +21,7 @@
             android:layout_below="@+id/imgProfile"
             android:layout_alignParentStart="true" />
 
-        <com.luseen.autolinklibrary.AutoLinkTextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="3"
@@ -84,7 +84,7 @@
             android:textStyle="bold"
             android:textColor="@color/instagram_bold_font" />
 
-        <com.luseen.autolinklibrary.AutoLinkTextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/comment_1_default_text"
@@ -96,7 +96,7 @@
             android:layout_below="@+id/tvViewAllComments"
             android:layout_alignParentStart="true" />
 
-        <com.luseen.autolinklibrary.AutoLinkTextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/comment_2_default_text"

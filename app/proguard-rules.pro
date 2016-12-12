@@ -24,6 +24,12 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keepclassmembers public class * extends com.bluelinelabs.conductor.Controller {
+   public <init>();
+   public <init>(android.os.Bundle);
+}
+
 -keep class io.realm.annotations.RealmModule
 -keep @io.realm.annotations.RealmModule class *
 -keep class io.realm.internal.Keep
