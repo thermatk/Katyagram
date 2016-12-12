@@ -16,10 +16,10 @@ public class InstagramPhoto {
     public String user2;
     public String id;
     public String code;
+    public String location;
     public int imageHeight;
     public int likesCount;
     public int commentsCount;
-    public String location;
 
     public void fromJSON(JSONObject photoJSON) throws JSONException {
         profileUrl = photoJSON.getJSONObject("user").getString("profile_picture");

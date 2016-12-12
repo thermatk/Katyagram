@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.luseen.autolinklibrary.AutoLinkMode;
+import com.luseen.autolinklibrary.AutoLinkOnClickListener;
 import com.luseen.autolinklibrary.AutoLinkTextView;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.princessviewer.R;
@@ -348,6 +349,12 @@ public class PhotosActivity extends AppCompatActivity {
             tv.setHashtagModeColor(ContextCompat.getColor(context, R.color.instagram_bold_font));
             tv.setCustomModeColor(ContextCompat.getColor(context, R.color.instagram_bold_font));
             tv.setMentionModeColor(ContextCompat.getColor(context, R.color.instagram_bold_font));
+            tv.setAutoLinkOnClickListener(new AutoLinkOnClickListener() {
+                @Override
+                public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText) {
+                    //
+                }
+            });
         }
     }
 
