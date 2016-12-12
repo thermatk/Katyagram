@@ -244,7 +244,7 @@ public class PhotosActivity extends AppCompatActivity {
                 }
                 final int curPos = position;
                 if (photo.commentsCount > 0) {
-                    photoViewHolder.tvViewAllComments.setText(String.format("показать все комментарии(%d)", photo.commentsCount));
+                    photoViewHolder.tvViewAllComments.setText(String.format("\uD83D\uDCAD (%d)", photo.commentsCount));
                     // set click handler for view all comments
                     photoViewHolder.tvViewAllComments.setOnClickListener(new View.OnClickListener() {
                         @Override
