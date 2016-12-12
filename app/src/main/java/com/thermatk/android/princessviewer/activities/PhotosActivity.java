@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -50,6 +49,16 @@ public class PhotosActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photos);
+
+        Intent intent = getIntent();
+        String intentUser = intent.getStringExtra("user");
+        if (intentUser != null) {
+            Log.d("katyagram", "Intent for photos " + intentUser);
+            user = intentUser;
+        } else {
+            Log.d("katyagram", "No intent for photos, default");
+        }
+
         mContext = this;
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
 
@@ -311,7 +320,7 @@ public class PhotosActivity extends AppCompatActivity {
             isLoading = false;
         }
     }
-    static class PhotoViewHolder extends RecyclerView.ViewHolder {
+    class PhotoViewHolder extends RecyclerView.ViewHolder {
         public ImageView imgProfile;
         public ImageView imgPhoto;
         public TextView tvUsername;
@@ -352,7 +361,11 @@ public class PhotosActivity extends AppCompatActivity {
             tv.setAutoLinkOnClickListener(new AutoLinkOnClickListener() {
                 @Override
                 public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText) {
-                    //
+                    if(autoLinkMode.equals(AutoLinkMode.MODE_CUSTOM) || autoLinkMode.equals(AutoLinkMode.MODE_MENTION)) {
+                        Log.d("katyagram", "mention tap");
+                    } else if (autoLinkMode.equals(AutoLinkMode.MODE_HASHTAG)) {
+                        Log.d("katyagram", "hashtag tap");
+                    }
                 }
             });
         }
