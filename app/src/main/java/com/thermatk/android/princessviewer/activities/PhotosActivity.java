@@ -2,6 +2,7 @@ package com.thermatk.android.princessviewer.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.luseen.autolinklibrary.AutoLinkMode;
+import com.luseen.autolinklibrary.AutoLinkTextView;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.princessviewer.R;
 import com.thermatk.android.princessviewer.data.InstagramPhoto;
@@ -237,14 +240,14 @@ public class PhotosActivity extends AppCompatActivity {
                                 DateUtils.FORMAT_ABBREV_RELATIVE));
                 photoViewHolder.tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.likesCount));
                 if (photo.caption != null) {
-                    photoViewHolder.tvCaption.setText(Html.fromHtml("<font color='#3f729b'><b>" + photo.username + "</b></font> " + photo.caption));
+                    photoViewHolder.tvCaption.setAutoLinkText(photo.caption);
                     photoViewHolder.tvCaption.setVisibility(View.VISIBLE);
                 } else {
                     photoViewHolder.tvCaption.setVisibility(View.GONE);
                 }
                 final int curPos = position;
                 if (photo.commentsCount > 0) {
-                    photoViewHolder.tvViewAllComments.setText(String.format("\uD83D\uDCAD (%d)", photo.commentsCount));
+                    photoViewHolder.tvViewAllComments.setText(String.format("\uD83D\uDCAD (%d):", photo.commentsCount));
                     // set click handler for view all comments
                     photoViewHolder.tvViewAllComments.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -263,14 +266,17 @@ public class PhotosActivity extends AppCompatActivity {
 
                 // Set last 2 comments
                 if (photo.comment1 != null) {
-                    photoViewHolder.tvComment1.setText(Html.fromHtml("<font color='#3f729b'><b>" + photo.user1 + "</b></font> " + photo.comment1));
+                    photoViewHolder.tvComment1.setCustomRegex("("+photo.user1+")");
+                    photoViewHolder.tvComment1.setAutoLinkText(photo.user1 + " " + photo.comment1);
                     photoViewHolder.tvComment1.setVisibility(View.VISIBLE);
                 } else {
                     photoViewHolder.tvComment1.setVisibility(View.GONE);
                 }
 
                 if (photo.comment2 != null) {
-                    photoViewHolder.tvComment2.setText(Html.fromHtml("<font color='#3f729b'><b>" + photo.user2 + "</b></font> " + photo.comment2));
+                    photoViewHolder.tvComment2.setCustomRegex("("+photo.user2+")");
+                    photoViewHolder.tvComment2.setAutoLinkText(photo.user2 + " " + photo.comment2);
+
                     photoViewHolder.tvComment2.setVisibility(View.VISIBLE);
                 } else {
                     photoViewHolder.tvComment2.setVisibility(View.GONE);
@@ -310,24 +316,38 @@ public class PhotosActivity extends AppCompatActivity {
         public TextView tvUsername;
         public TextView tvTime;
         public TextView tvLikes;
-        public TextView tvCaption;
+        public AutoLinkTextView tvCaption;
         public TextView tvViewAllComments;
-        public TextView tvComment1;
-        public TextView tvComment2;
+        public AutoLinkTextView tvComment1;
+        public AutoLinkTextView  tvComment2;
 
         public PhotoViewHolder(View itemView) {
             super(itemView);
             // Lookup the subview within the template
+            Context context = itemView.getContext();
             imgProfile = (ImageView) itemView.findViewById(R.id.imgProfile);
             imgPhoto = (ImageView) itemView.findViewById(R.id.imgPhoto);
             tvUsername = (TextView) itemView.findViewById(R.id.tvUsername);
             tvTime = (TextView) itemView.findViewById(R.id.tvTime);
             tvLikes = (TextView) itemView.findViewById(R.id.tvLikes);
-            tvCaption = (TextView) itemView.findViewById(R.id.tvCaption);
+            tvCaption = (AutoLinkTextView) itemView.findViewById(R.id.tvCaption);
             tvViewAllComments = (TextView) itemView.findViewById(R.id.tvViewAllComments);
-            tvComment1 = (TextView) itemView.findViewById(R.id.tvComment1);
-            tvComment2 = (TextView) itemView.findViewById(R.id.tvComment2);
+            tvComment1 = (AutoLinkTextView) itemView.findViewById(R.id.tvComment1);
+            tvComment2 = (AutoLinkTextView) itemView.findViewById(R.id.tvComment2);
 
+            setupLinkTextView(tvComment1, context);
+            setupLinkTextView(tvComment2, context);
+            setupLinkTextView(tvCaption, context);
+        }
+
+        public void setupLinkTextView (AutoLinkTextView tv, Context context) {
+            tv.addAutoLinkMode(
+                    AutoLinkMode.MODE_HASHTAG,
+                    AutoLinkMode.MODE_MENTION,
+                    AutoLinkMode.MODE_CUSTOM);
+            tv.setHashtagModeColor(ContextCompat.getColor(context, R.color.instagram_bold_font));
+            tv.setCustomModeColor(ContextCompat.getColor(context, R.color.instagram_bold_font));
+            tv.setMentionModeColor(ContextCompat.getColor(context, R.color.instagram_bold_font));
         }
     }
 

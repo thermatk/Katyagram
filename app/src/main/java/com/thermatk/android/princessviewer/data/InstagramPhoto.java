@@ -19,6 +19,7 @@ public class InstagramPhoto {
     public int imageHeight;
     public int likesCount;
     public int commentsCount;
+    public String location;
 
     public void fromJSON(JSONObject photoJSON) throws JSONException {
         profileUrl = photoJSON.getJSONObject("user").getString("profile_picture");
@@ -48,5 +49,9 @@ public class InstagramPhoto {
         }
         id = photoJSON.getString("id");
         code = photoJSON.getString("code");
+
+        if (photoJSON.has("location") && !photoJSON.isNull("location")) {
+            location = photoJSON.getJSONObject("location").getString("name");
+        }
     }
 }

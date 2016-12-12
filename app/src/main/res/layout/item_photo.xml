@@ -21,14 +21,14 @@
             android:layout_below="@+id/imgProfile"
             android:layout_alignParentStart="true" />
 
-        <TextView
+        <com.luseen.autolinklibrary.AutoLinkTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="3"
             android:ellipsize="end"
             android:text="@string/caption_default_text"
             android:id="@+id/tvCaption"
-            android:layout_below="@+id/tvLikes"
+            android:layout_below="@+id/imgPhoto"
             android:layout_alignParentStart="true"
             android:paddingTop="4dp"
             android:paddingLeft="8dp"
@@ -77,15 +77,14 @@
             android:layout_height="wrap_content"
             android:text="@string/like_default_text"
             android:id="@+id/tvLikes"
-            android:layout_below="@+id/imgPhoto"
-            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tvCaption"
             android:layout_alignParentStart="true"
             android:paddingLeft="8dp"
             android:paddingTop="8dp"
             android:textStyle="bold"
             android:textColor="@color/instagram_bold_font" />
 
-        <TextView
+        <com.luseen.autolinklibrary.AutoLinkTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/comment_1_default_text"
@@ -95,10 +94,9 @@
             android:paddingRight="8dp"
             android:paddingBottom="0dp"
             android:layout_below="@+id/tvViewAllComments"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
-        <TextView
+        <com.luseen.autolinklibrary.AutoLinkTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/comment_2_default_text"
@@ -108,7 +106,6 @@
             android:paddingRight="8dp"
             android:paddingBottom="0dp"
             android:layout_below="@+id/tvComment1"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
         <TextView
@@ -117,7 +114,7 @@
             android:clickable="true"
             android:text="@string/view_all_comments_default_text"
             android:id="@+id/tvViewAllComments"
-            android:layout_below="@+id/tvCaption"
+            android:layout_below="@+id/tvLikes"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:paddingTop="0dp"
