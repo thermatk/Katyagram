@@ -12,7 +12,7 @@ import com.thermatk.android.princessviewer.R;
 import com.thermatk.android.princessviewer.controllers.PhotosListController;
 
 
-public class PhotosActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     private Router router;
 

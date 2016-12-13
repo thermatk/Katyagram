@@ -1,7 +1,6 @@
 package com.thermatk.android.princessviewer.controllers;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -30,7 +29,6 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.princessviewer.R;
-import com.thermatk.android.princessviewer.activities.CommentsActivity;
 import com.thermatk.android.princessviewer.data.InstagramPhoto;
 import com.thermatk.android.princessviewer.interfaces.ILoadMore;
 
@@ -135,6 +133,7 @@ public class PhotosListController extends Controller{
 
         // do the network request
         String popularUrl = "https://www.instagram.com/" +user+ "/media/";
+        Log.d("katyagram", popularUrl);
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(popularUrl, new JsonHttpResponseHandler() {
             // define success and failure callbacks
@@ -321,12 +320,11 @@ public class PhotosListController extends Controller{
                     photoViewHolder.tvViewAllComments.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Context ctx = photoViewHolder.tvViewAllComments.getContext();
-                            Intent intent = new Intent(ctx, CommentsActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             InstagramPhoto photo = photos.get(curPos);
-                            intent.putExtra("code", photo.code);
-                            ctx.startActivity(intent);
+                            getRouter().pushController(
+                                    RouterTransaction.with(new PhotoController(photo.code))
+                                            .pushChangeHandler(new FadeChangeHandler())
+                                            .popChangeHandler(new FadeChangeHandler()));
                         }
                     });
                     photoViewHolder.tvViewAllComments.setVisibility(View.VISIBLE);

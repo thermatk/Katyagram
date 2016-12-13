@@ -3,15 +3,11 @@ package com.thermatk.android.princessviewer.controllers;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,22 +22,17 @@ import com.bluelinelabs.conductor.ControllerChangeHandler;
 import com.bluelinelabs.conductor.ControllerChangeType;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
-import com.klinker.android.link_builder.Link;
-import com.klinker.android.link_builder.LinkBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.princessviewer.R;
-import com.thermatk.android.princessviewer.activities.CommentsActivity;
 import com.thermatk.android.princessviewer.data.InstagramPhoto;
-import com.thermatk.android.princessviewer.interfaces.ILoadMore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -243,11 +234,10 @@ public class HashTagListController extends Controller{
                 InstagramPhoto item = photos.get(itemPosition);
                 Log.d("katyagram", "Grid clicked on "  + item.code);
 
-                Context ctx = view.getContext();
-                Intent intent = new Intent(ctx, CommentsActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("code", item.code);
-                ctx.startActivity(intent);
+                getRouter().pushController(
+                        RouterTransaction.with(new PhotoController(item.code))
+                                .pushChangeHandler(new FadeChangeHandler())
+                                .popChangeHandler(new FadeChangeHandler()));
             }
         }
 
