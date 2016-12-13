@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,9 +39,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
+
+import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkAuthor;
+import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkHashtags;
+import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkMentions;
 
 public class PhotosListController extends Controller{
     private ArrayList<InstagramPhoto> photos;
@@ -286,8 +288,27 @@ public class PhotosListController extends Controller{
                     photoViewHolder.tvCaption.setText(photo.caption);
 
                     LinkBuilder.on(photoViewHolder.tvCaption)
-                            .addLink(setupLinkHashtags(ctx))
-                            .addLink(setupLinkMentions(ctx))
+                            .addLink(setupLinkHashtags(ctx,new Link.OnClickListener() {
+                                @Override
+                                public void onClick(String clickedText) {
+                                    // single clicked
+                                    //
+                                    getRouter().pushController(
+                                            RouterTransaction.with(new HashTagListController(clickedText.substring(1)))
+                                                    .pushChangeHandler(new FadeChangeHandler())
+                                                    .popChangeHandler(new FadeChangeHandler()));
+                                }
+                            }))
+                            .addLink(setupLinkMentions(ctx, new Link.OnClickListener() {
+                                @Override
+                                public void onClick(String clickedText) {
+                                    // single clicked
+                                    getRouter().pushController(
+                                            RouterTransaction.with(new PhotosListController(clickedText.substring(1)))
+                                                    .pushChangeHandler(new FadeChangeHandler())
+                                                    .popChangeHandler(new FadeChangeHandler()));
+                                }
+                            }))
                             .build();
                     photoViewHolder.tvCaption.setVisibility(View.VISIBLE);
                 } else {
@@ -317,9 +338,37 @@ public class PhotosListController extends Controller{
                 if (photo.comment1 != null) {
                     photoViewHolder.tvComment1.setText(photo.user1 + " " + photo.comment1);
                     LinkBuilder.on(photoViewHolder.tvComment1)
-                            .addLink(setupLinkHashtags(ctx))
-                            .addLink(setupLinkMentions(ctx))
-                            .addLink(setupLinkAuthor(photo.user1, ctx))
+                            .addLink(setupLinkHashtags(ctx, new Link.OnClickListener() {
+                                @Override
+                                public void onClick(String clickedText) {
+                                    // single clicked
+                                    //
+                                    getRouter().pushController(
+                                            RouterTransaction.with(new HashTagListController(clickedText.substring(1)))
+                                                    .pushChangeHandler(new FadeChangeHandler())
+                                                    .popChangeHandler(new FadeChangeHandler()));
+                                }
+                            }))
+                            .addLink(setupLinkMentions(ctx, new Link.OnClickListener() {
+                                @Override
+                                public void onClick(String clickedText) {
+                                    // single clicked
+                                    getRouter().pushController(
+                                            RouterTransaction.with(new PhotosListController(clickedText.substring(1)))
+                                                    .pushChangeHandler(new FadeChangeHandler())
+                                                    .popChangeHandler(new FadeChangeHandler()));
+                                }
+                            }))
+                            .addLink(setupLinkAuthor(photo.user1, ctx, new Link.OnClickListener() {
+                                @Override
+                                public void onClick(String clickedText) {
+                                    // single clicked
+                                    getRouter().pushController(
+                                            RouterTransaction.with(new PhotosListController(clickedText))
+                                                    .pushChangeHandler(new FadeChangeHandler())
+                                                    .popChangeHandler(new FadeChangeHandler()));
+                                }
+                            }))
                             .build();
                     photoViewHolder.tvComment1.setVisibility(View.VISIBLE);
                 } else {
@@ -329,9 +378,37 @@ public class PhotosListController extends Controller{
                 if (photo.comment2 != null) {
                     photoViewHolder.tvComment2.setText(photo.user2 + " " + photo.comment2);
                     LinkBuilder.on(photoViewHolder.tvComment2)
-                            .addLink(setupLinkHashtags(ctx))
-                            .addLink(setupLinkMentions(ctx))
-                            .addLink(setupLinkAuthor(photo.user2, ctx))
+                            .addLink(setupLinkHashtags(ctx,new Link.OnClickListener() {
+                                @Override
+                                public void onClick(String clickedText) {
+                                    // single clicked
+                                    //
+                                    getRouter().pushController(
+                                            RouterTransaction.with(new HashTagListController(clickedText.substring(1)))
+                                                    .pushChangeHandler(new FadeChangeHandler())
+                                                    .popChangeHandler(new FadeChangeHandler()));
+                                }
+                            }))
+                            .addLink(setupLinkMentions(ctx,new Link.OnClickListener() {
+                                @Override
+                                public void onClick(String clickedText) {
+                                    // single clicked
+                                    getRouter().pushController(
+                                            RouterTransaction.with(new PhotosListController(clickedText.substring(1)))
+                                                    .pushChangeHandler(new FadeChangeHandler())
+                                                    .popChangeHandler(new FadeChangeHandler()));
+                                }
+                            }))
+                            .addLink(setupLinkAuthor(photo.user2, ctx,new Link.OnClickListener() {
+                                @Override
+                                public void onClick(String clickedText) {
+                                    // single clicked
+                                    getRouter().pushController(
+                                            RouterTransaction.with(new PhotosListController(clickedText))
+                                                    .pushChangeHandler(new FadeChangeHandler())
+                                                    .popChangeHandler(new FadeChangeHandler()));
+                                }
+                            }))
                             .build();
 
                     photoViewHolder.tvComment2.setVisibility(View.VISIBLE);
@@ -356,62 +433,6 @@ public class PhotosListController extends Controller{
                 LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
                 loadingViewHolder.progressBar.setIndeterminate(true);
             }
-        }
-
-        public Link setupLinkAuthor(String name, Context ctx) {
-            Link link = new Link(name)
-                    .setTextColor(ContextCompat.getColor(ctx, R.color.instagram_bold_font))                  // optional, defaults to holo blue
-                    .setHighlightAlpha(.4f)                                     // optional, defaults to .15f
-                    .setUnderlined(false)                                       // optional, defaults to true
-                    .setBold(true)                                              // optional, defaults to false
-                    .setOnClickListener(new Link.OnClickListener() {
-                        @Override
-                        public void onClick(String clickedText) {
-                            // single clicked
-                            getRouter().pushController(
-                                    RouterTransaction.with(new PhotosListController(clickedText))
-                                            .pushChangeHandler(new FadeChangeHandler())
-                                            .popChangeHandler(new FadeChangeHandler()));
-                        }
-                    });
-            return link;
-        }
-
-        public Link setupLinkHashtags(Context ctx) {
-            Link link = new Link(Pattern.compile("(#\\w+)"))
-                    .setTextColor(ContextCompat.getColor(ctx, R.color.instagram_bold_font))
-                    .setUnderlined(false)
-                    .setBold(false)
-                    .setOnClickListener(new Link.OnClickListener() {
-                        @Override
-                        public void onClick(String clickedText) {
-                            // single clicked
-                            //
-                            getRouter().pushController(
-                                    RouterTransaction.with(new HashTagListController(clickedText.substring(1)))
-                                            .pushChangeHandler(new FadeChangeHandler())
-                                            .popChangeHandler(new FadeChangeHandler()));
-                        }
-                    });
-            return link;
-        }
-
-        public Link setupLinkMentions(Context ctx) {
-            Link link = new Link(Pattern.compile("(@\\w+)"))
-                    .setTextColor(ContextCompat.getColor(ctx, R.color.instagram_bold_font))
-                    .setUnderlined(false)
-                    .setBold(false)
-                    .setOnClickListener(new Link.OnClickListener() {
-                        @Override
-                        public void onClick(String clickedText) {
-                            // single clicked
-                            getRouter().pushController(
-                                    RouterTransaction.with(new PhotosListController(clickedText.substring(1)))
-                                            .pushChangeHandler(new FadeChangeHandler())
-                                            .popChangeHandler(new FadeChangeHandler()));
-                        }
-                    });
-            return link;
         }
 
         @Override
