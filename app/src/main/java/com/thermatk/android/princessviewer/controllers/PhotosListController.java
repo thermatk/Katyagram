@@ -157,7 +157,7 @@ public class PhotosListController extends Controller{
                     if(photos.size() == 0) {
                         Log.d("katyagram", "Private profile");
                         Toast.makeText(getApplicationContext(),
-                                R.string.error_restricted, Toast.LENGTH_LONG);
+                                R.string.error_restricted, Toast.LENGTH_LONG).show();
                         getRouter().handleBack();
                     }
                     aPhotos.notifyDataSetChanged();
