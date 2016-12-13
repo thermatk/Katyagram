@@ -149,7 +149,7 @@ public class PhotosListController extends Controller{
                     photosJSON = response.getJSONArray("items");
                     for (int i = 0; i < photosJSON.length(); i++) {
                         InstagramPhoto photo = new InstagramPhoto();
-                        photo.fromJSON(photosJSON.getJSONObject(i));
+                        photo.fromJSONMediaList(photosJSON.getJSONObject(i));
                         photos.add(photo);
                     }
                     // notify adapter
@@ -189,7 +189,7 @@ public class PhotosListController extends Controller{
                     photosJSON = response.getJSONArray("items");
                     for (int i = 0; i < photosJSON.length(); i++) {
                         InstagramPhoto photo = new InstagramPhoto();
-                        photo.fromJSON(photosJSON.getJSONObject(i));
+                        photo.fromJSONMediaList(photosJSON.getJSONObject(i));
                         photos.add(photo);
                     }
                     // notify adapter
@@ -267,13 +267,16 @@ public class PhotosListController extends Controller{
             if (holder instanceof PhotoViewHolder) {
                 InstagramPhoto photo = photos.get(position);
 
+                final String code = photo.code;
 
                 final PhotoViewHolder photoViewHolder = (PhotoViewHolder) holder;
 
 
                 // Populate the subviews (textfield, imageview) with the correct data
                 photoViewHolder.tvUsername.setText(photo.username);
-                //photoViewHolder.tvTime.setText(photo.getRelativeTime());
+
+                Context ctx = photoViewHolder.tvCaption.getContext();
+
                 photoViewHolder.tvTime.setText(
                         DateUtils.getRelativeTimeSpanString(
                                 Long.parseLong(photo.createdTime)*1000,
@@ -281,8 +284,6 @@ public class PhotosListController extends Controller{
                                 DateUtils.MINUTE_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_RELATIVE));
                 photoViewHolder.tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.likesCount));
-
-                Context ctx = photoViewHolder.tvCaption.getContext();
                 if (photo.caption != null) {
                     photoViewHolder.tvCaption.setText(photo.caption);
 
@@ -426,6 +427,15 @@ public class PhotosListController extends Controller{
                 // Background: Send a network request to the url, download the image bytes, convert into bitmap, insert bitmap into the imageview
                 Picasso.with(ctx).load(photo.profileUrl).into(photoViewHolder.imgProfile);
                 Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
+                photoViewHolder.imgPhoto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        getRouter().pushController(
+                                RouterTransaction.with(new PhotoController(code))
+                                        .pushChangeHandler(new FadeChangeHandler())
+                                        .popChangeHandler(new FadeChangeHandler()));
+                    }
+                });
 
             } else if (holder instanceof LoadingViewHolder) {
                 LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;

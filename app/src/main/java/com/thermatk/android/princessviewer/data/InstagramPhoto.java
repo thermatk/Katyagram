@@ -17,11 +17,13 @@ public class InstagramPhoto {
     public String id;
     public String code;
     public String location;
+    public long locationId;
+
     public int imageHeight;
     public int likesCount;
     public int commentsCount;
 
-    public void fromJSONBasic(JSONObject photoJSON) throws JSONException {
+    public void fromJSONHashTagList(JSONObject photoJSON) throws JSONException {
         // caption may be null
         if (photoJSON.has("caption") && !photoJSON.isNull("caption")) {
             caption = photoJSON.getString("caption");
@@ -38,7 +40,34 @@ public class InstagramPhoto {
         code = photoJSON.getString("code");
     }
 
-    public void fromJSON(JSONObject photoJSON) throws JSONException {
+    public void fromJSONPhoto(JSONObject photoJSON) throws JSONException {
+        profileUrl = photoJSON.getJSONObject("owner").getString("profile_pic_url");
+        username = photoJSON.getJSONObject("owner").getString("username");
+        // caption may be null
+        if (photoJSON.has("caption") && !photoJSON.isNull("caption")) {
+            caption = photoJSON.getString("caption");
+        }
+        createdTime = photoJSON.getLong("date") + "";
+
+        imageUrl = photoJSON.getString("display_src");
+        imageHeight = photoJSON.getJSONObject("dimensions").getInt("height");
+
+
+        likesCount = photoJSON.getJSONObject("likes").getInt("count");
+
+        id = photoJSON.getString("id");
+        code = photoJSON.getString("code");
+
+        if (photoJSON.has("location") && !photoJSON.isNull("location")) {
+            location = photoJSON.getJSONObject("location").getString("name");
+        }
+
+        if (photoJSON.has("comments") && !photoJSON.isNull("comments")) {
+            commentsCount = photoJSON.getJSONObject("comments").getInt("count");
+        }
+    }
+
+    public void fromJSONMediaList(JSONObject photoJSON) throws JSONException {
         profileUrl = photoJSON.getJSONObject("user").getString("profile_picture");
         username = photoJSON.getJSONObject("user").getString("username");
         // caption may be null
