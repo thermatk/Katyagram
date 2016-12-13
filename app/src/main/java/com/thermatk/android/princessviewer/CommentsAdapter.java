@@ -2,6 +2,7 @@ package com.thermatk.android.princessviewer;
 
 import android.content.Context;
 import android.text.Html;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,12 @@ public class CommentsAdapter extends ArrayAdapter<Comment> {
         TextView tvCommentTime = (TextView) convertView.findViewById(R.id.tvCommentTime);
 
         tvComment.setText(Html.fromHtml("<font color='#3f729b'><b>" + comment.username + "</b></font> " + comment.text));
-        tvCommentTime.setText(comment.getRelativeTime());
+
+        tvCommentTime.setText(
+                DateUtils.getRelativeTimeSpanString(comment.createdTime*1000,
+                        System.currentTimeMillis(),
+                        DateUtils.SECOND_IN_MILLIS,
+                        DateUtils.FORMAT_ABBREV_RELATIVE));
 
         // Reset the images from the recycled view
         imgProfile.setImageResource(0);

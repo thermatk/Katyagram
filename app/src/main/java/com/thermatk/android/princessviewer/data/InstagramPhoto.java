@@ -21,6 +21,45 @@ public class InstagramPhoto {
     public int likesCount;
     public int commentsCount;
 
+    public void fromJSONBasic(JSONObject photoJSON) throws JSONException {
+        /*
+        	        "code": "BN8a7_Xh2bP",
+					"dimensions": {
+						"width": 750,
+						"height": 750
+					},
+					"owner": {
+						"id": "1317615455"
+					},
+					"comments": {
+						"count": 70
+					},
+					"caption": "That smile 😍\n-\nTag 3 guys that would fall in love with her 👇",
+					"likes": {
+						"count": 11725
+					},
+					"date": 1481603651,
+					"thumbnail_src": "",
+					"is_video": false,
+					"id": "1404115655531652815",
+					"display_src": ""
+         */
+        // caption may be null
+        if (photoJSON.has("caption") && !photoJSON.isNull("caption")) {
+            caption = photoJSON.getString("caption");
+        }
+        createdTime = photoJSON.getLong("date") + "";
+        imageUrl = photoJSON.getString("thumbnail_src");
+        imageHeight = 640;
+        likesCount = photoJSON.getJSONObject("likes").getInt("count");
+        // get comments
+        if (photoJSON.has("comments") && !photoJSON.isNull("comments")) {
+            commentsCount = photoJSON.getJSONObject("comments").getInt("count");
+        }
+        id = photoJSON.getString("id");
+        code = photoJSON.getString("code");
+    }
+
     public void fromJSON(JSONObject photoJSON) throws JSONException {
         profileUrl = photoJSON.getJSONObject("user").getString("profile_picture");
         username = photoJSON.getJSONObject("user").getString("username");

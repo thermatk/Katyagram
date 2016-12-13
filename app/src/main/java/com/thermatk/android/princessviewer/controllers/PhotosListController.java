@@ -277,7 +277,7 @@ public class PhotosListController extends Controller{
                         DateUtils.getRelativeTimeSpanString(
                                 Long.parseLong(photo.createdTime)*1000,
                                 System.currentTimeMillis(),
-                                DateUtils.DAY_IN_MILLIS,
+                                DateUtils.MINUTE_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_RELATIVE));
                 photoViewHolder.tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.likesCount));
 
@@ -387,12 +387,10 @@ public class PhotosListController extends Controller{
                         public void onClick(String clickedText) {
                             // single clicked
                             //
-                            /*
                             getRouter().pushController(
-                                    RouterTransaction.with(new PhotosListController(clickedText))
+                                    RouterTransaction.with(new HashTagListController(clickedText.substring(1)))
                                             .pushChangeHandler(new FadeChangeHandler())
                                             .popChangeHandler(new FadeChangeHandler()));
-                                            */
                         }
                     });
             return link;
