@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bluelinelabs.conductor.Controller;
 import com.bluelinelabs.conductor.ControllerChangeHandler;
@@ -153,6 +154,12 @@ public class PhotosListController extends Controller{
                         photos.add(photo);
                     }
                     // notify adapter
+                    if(photos.size() == 0) {
+                        Log.d("katyagram", "Private profile");
+                        Toast.makeText(getApplicationContext(),
+                                R.string.error_restricted, Toast.LENGTH_LONG);
+                        getRouter().handleBack();
+                    }
                     aPhotos.notifyDataSetChanged();
                     aPhotos.setLoaded();
                 } catch (JSONException e ) {
