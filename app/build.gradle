@@ -34,5 +34,6 @@ dependencies {
     compile 'com.makeramen:roundedimageview:1.5.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    compile 'com.bluelinelabs:conductor:2.0.4'
+    compile 'com.bluelinelabs:conductor:2.0.5'
+    compile 'com.bluelinelabs:conductor-support:2.0.5'
 }

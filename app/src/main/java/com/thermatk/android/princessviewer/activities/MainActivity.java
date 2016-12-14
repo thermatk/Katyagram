@@ -15,13 +15,14 @@ import com.thermatk.android.princessviewer.controllers.PhotosListController;
 public class MainActivity extends AppCompatActivity {
 
     private Router router;
+    public ViewGroup container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ViewGroup container = (ViewGroup)findViewById(R.id.controller_container);
+        container = (ViewGroup)findViewById(R.id.controller_container);
 
         router = Conductor.attachRouter(this, container, savedInstanceState);
         if (!router.hasRootController()) {

@@ -179,7 +179,7 @@ public class PhotoController extends Controller{
                             // single clicked
                             //
                             getRouter().pushController(
-                                    RouterTransaction.with(new HashTagListController(clickedText.substring(1)))
+                                    RouterTransaction.with(new HashTagController(clickedText.substring(1)))
                                             .pushChangeHandler(new FadeChangeHandler())
                                             .popChangeHandler(new FadeChangeHandler()));
                         }
@@ -320,7 +320,7 @@ public class PhotoController extends Controller{
                                 // single clicked
                                 //
                                 getRouter().pushController(
-                                        RouterTransaction.with(new HashTagListController(clickedText.substring(1)))
+                                        RouterTransaction.with(new HashTagController(clickedText.substring(1)))
                                                 .pushChangeHandler(new FadeChangeHandler())
                                                 .popChangeHandler(new FadeChangeHandler()));
                             }

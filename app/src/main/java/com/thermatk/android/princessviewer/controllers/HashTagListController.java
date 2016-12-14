@@ -232,7 +232,7 @@ public class HashTagListController extends Controller{
                 InstagramPhoto item = photos.get(itemPosition);
                 Log.d("katyagram", "Grid clicked on "  + item.code);
 
-                getRouter().pushController(
+                getParentController().getRouter().pushController(
                         RouterTransaction.with(new PhotoController(item.code))
                                 .pushChangeHandler(new FadeChangeHandler())
                                 .popChangeHandler(new FadeChangeHandler()));
