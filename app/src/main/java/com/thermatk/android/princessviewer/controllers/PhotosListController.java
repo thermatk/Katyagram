@@ -65,7 +65,7 @@ public class PhotosListController extends Controller{
 
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        View view = inflater.inflate(R.layout.controller_photos_list, container, false);
+        View view = inflater.inflate(R.layout.controller_list, container, false);
         Context ctx = view.getContext();
 
         user = getArgs().getString("user");
@@ -468,7 +468,6 @@ public class PhotosListController extends Controller{
             public PhotoViewHolder(View itemView) {
                 super(itemView);
                 // Lookup the subview within the template
-                Context context = itemView.getContext();
                 imgProfile = (ImageView) itemView.findViewById(R.id.imgProfile);
                 imgPhoto = (ImageView) itemView.findViewById(R.id.imgPhoto);
                 tvUsername = (TextView) itemView.findViewById(R.id.tvUsername);

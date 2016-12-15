@@ -11,30 +11,27 @@ import java.util.regex.Pattern;
 public class TextViewLinks {
 
     public static Link setupLinkAuthor(String name, Context ctx, Link.OnClickListener clk) {
-        Link link = new Link(name)
+        return new Link(name)
                 .setTextColor(ContextCompat.getColor(ctx, R.color.instagram_bold_font))                  // optional, defaults to holo blue
                 .setHighlightAlpha(.4f)                                     // optional, defaults to .15f
                 .setUnderlined(false)                                       // optional, defaults to true
                 .setBold(true)                                              // optional, defaults to false
                 .setOnClickListener(clk);
-        return link;
     }
 
     public static Link setupLinkHashtags(Context ctx, Link.OnClickListener clk) {
-        Link link = new Link(Pattern.compile("(#\\w+)"))
+        return new Link(Pattern.compile("(#\\w+)"))
                 .setTextColor(ContextCompat.getColor(ctx, R.color.instagram_bold_font))
                 .setUnderlined(false)
                 .setBold(false)
                 .setOnClickListener(clk);
-        return link;
     }
 
     public static Link setupLinkMentions(Context ctx, Link.OnClickListener clk) {
-        Link link = new Link(Pattern.compile("(@\\w+)"))
+        return new Link(Pattern.compile("(@\\w+)"))
                 .setTextColor(ContextCompat.getColor(ctx, R.color.instagram_bold_font))
                 .setUnderlined(false)
                 .setBold(false)
                 .setOnClickListener(clk);
-        return link;
     }
 }

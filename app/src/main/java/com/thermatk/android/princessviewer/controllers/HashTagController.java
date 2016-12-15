@@ -22,7 +22,6 @@ import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundle
 public class HashTagController extends Controller {
     private String tag;
     private final static String BUNDLE_KEY = "tag";
-    private TabLayout tabLayout;
     private ViewPager viewPager;
     private final ControllerPagerAdapter pagerAdapter;
 
@@ -65,10 +64,9 @@ public class HashTagController extends Controller {
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.controller_hashtag_pager, container, false);
-        Context ctx = view.getContext();
         tag = getArgs().getString(BUNDLE_KEY);
 
-        tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
+        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         viewPager = (ViewPager) view.findViewById(R.id.view_pager);
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);

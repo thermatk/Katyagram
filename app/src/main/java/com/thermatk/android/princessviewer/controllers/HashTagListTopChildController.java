@@ -54,7 +54,7 @@ public class HashTagListTopChildController extends Controller{
 
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        View view = inflater.inflate(R.layout.controller_photos_list, container, false);
+        View view = inflater.inflate(R.layout.controller_list, container, false);
         Context ctx = view.getContext();
 
         tag = getArgs().getString("tag");
