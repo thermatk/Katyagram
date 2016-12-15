@@ -2,10 +2,12 @@ package com.thermatk.android.princessviewer.controllers;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -25,6 +27,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.princessviewer.R;
 import com.thermatk.android.princessviewer.data.InstagramPhoto;
+import com.thermatk.android.princessviewer.interfaces.ILoadMore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +41,7 @@ import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundle
 
 public class HashTagListLastChildController extends Controller{
     private ArrayList<InstagramPhoto> photos;
-    private HashTagTopAdapter aPhotos;
+    private HashTagLastAdapter aPhotos;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipeContainer;
     private boolean moreAvailable;
@@ -80,10 +83,27 @@ public class HashTagListLastChildController extends Controller{
         mRecyclerView = (RecyclerView) view.findViewById(R.id.lvPhotos);
         mRecyclerView.setLayoutManager(new GridLayoutManager(ctx, 2));
 
-        aPhotos = new HashTagTopAdapter(LayoutInflater.from(ctx));
+        aPhotos = new HashTagLastAdapter(LayoutInflater.from(ctx));
         mRecyclerView.setAdapter(aPhotos);
 
         aPhotos.isLoading = true;
+        aPhotos.setOnLoadMoreListener(new ILoadMore() {
+            @Override
+            public void onLoadMore() {
+                Log.e("katyagram", "Load More");
+                if (moreAvailable) {
+                    photos.add(null);
+                    Handler handler = new Handler();
+                    handler.post(new Runnable() {
+                        public void run() {
+                            aPhotos.notifyItemInserted(photos.size() - 1);
+                        }
+                    });
+                    fetchPhotosAdditional();
+                }
+            }
+        });
+
 
         fetchPhotosInitial();
         return view;
@@ -141,18 +161,78 @@ public class HashTagListLastChildController extends Controller{
             }
         });
     }
+    private void fetchPhotosAdditional() {
+        // do the network request
+        String popularUrl = "https://www.instagram.com/explore/tags/"+tag+"/?__a=1&max_id="+endId;
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(popularUrl, new JsonHttpResponseHandler() {
+            // define success and failure callbacks
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                photos.remove(photos.size() - 1);
+                aPhotos.notifyItemRemoved(photos.size());
 
-    class HashTagTopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+                JSONArray photosJSON;
+                try {
+                    JSONObject pageInfo = response.getJSONObject("tag").getJSONObject("media").getJSONObject("page_info");
+                    moreAvailable = pageInfo.getBoolean("has_next_page");
+                    endId = pageInfo.getString("end_cursor");
+                    photosJSON = response.getJSONObject("tag").getJSONObject("media").getJSONArray("nodes");
+                    for (int i = 0; i < photosJSON.length(); i++) {
+                        InstagramPhoto photo = new InstagramPhoto();
+                        photo.fromJSONHashTagList(photosJSON.getJSONObject(i));
+                        photos.add(photo);
+                    }
+                    // notify adapter
+                    aPhotos.notifyDataSetChanged();
+                    aPhotos.setLoaded();
+                } catch (JSONException e ) {
+                    // json failed
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d("katyagram",statusCode + responseString);
+            }
+        });
+    }
+    class HashTagLastAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private final int VIEW_TYPE_ITEM = 0;
         private final int VIEW_TYPE_LOADING = 1;
 
         private boolean isLoading;
         private final LayoutInflater inflater;
+
+        private ILoadMore mOnLoadMoreListener;
+        private int visibleThreshold = 2;
+        private int lastVisibleItem, totalItemCount;
         private final View.OnClickListener mOnClickListener = new PhotoOnClickListener();
 
-        public HashTagTopAdapter(LayoutInflater inflater) {
+        public HashTagLastAdapter(LayoutInflater inflater) {
             this.inflater = inflater;
+            final GridLayoutManager gridLayoutManager = (GridLayoutManager) mRecyclerView.getLayoutManager();
+            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                    totalItemCount = gridLayoutManager.getItemCount();
+                    lastVisibleItem = gridLayoutManager.findLastVisibleItemPosition();
+                    if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        if (mOnLoadMoreListener != null) {
+                            mOnLoadMoreListener.onLoadMore();
+                        }
+                        isLoading = true;
+                    }
+                }
+            });
+        }
+
+        public void setOnLoadMoreListener(ILoadMore mOnLoadMoreListener) {
+            this.mOnLoadMoreListener = mOnLoadMoreListener;
         }
 
         @Override
