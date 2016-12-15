@@ -41,6 +41,7 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
+import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundleWithString;
 import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkAuthor;
 import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkHashtags;
 import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkMentions;
@@ -51,6 +52,7 @@ public class PhotosListController extends Controller{
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipeContainer;
     private boolean moreAvailable;
+    private final static String BUNDLE_KEY = "user";
     private String user;
 
     public PhotosListController(@Nullable Bundle args) {
@@ -58,13 +60,7 @@ public class PhotosListController extends Controller{
     }
 
     public PhotosListController(String user) {
-        this(createBundle(user));
-    }
-
-    public static Bundle createBundle (String user) {
-        Bundle b = new Bundle();
-        b.putString("user", user);
-        return b;
+        this(createBundleWithString(BUNDLE_KEY,user));
     }
 
     @Override

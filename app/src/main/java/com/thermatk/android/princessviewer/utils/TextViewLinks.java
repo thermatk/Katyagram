@@ -3,13 +3,8 @@ package com.thermatk.android.princessviewer.utils;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 
-import com.bluelinelabs.conductor.Controller;
-import com.bluelinelabs.conductor.RouterTransaction;
-import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.klinker.android.link_builder.Link;
 import com.thermatk.android.princessviewer.R;
-import com.thermatk.android.princessviewer.controllers.HashTagListController;
-import com.thermatk.android.princessviewer.controllers.PhotosListController;
 
 import java.util.regex.Pattern;
 

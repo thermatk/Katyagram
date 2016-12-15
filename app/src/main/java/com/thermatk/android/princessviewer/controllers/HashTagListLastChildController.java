@@ -34,25 +34,24 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class HashTagListController extends Controller{
+import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundleWithString;
+
+public class HashTagListLastChildController extends Controller{
     private ArrayList<InstagramPhoto> photos;
     private HashTagTopAdapter aPhotos;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipeContainer;
+    private boolean moreAvailable;
+    private String endId;
+    private final static String BUNDLE_KEY = "tag";
     private String tag;
 
-    public HashTagListController(@Nullable Bundle args) {
+    public HashTagListLastChildController(@Nullable Bundle args) {
         super(args);
     }
 
-    public HashTagListController(String user) {
-        this(createBundle(user));
-    }
-
-    public static Bundle createBundle (String tag) {
-        Bundle b = new Bundle();
-        b.putString("tag", tag);
-        return b;
+    public HashTagListLastChildController(String tag) {
+        this(createBundleWithString(BUNDLE_KEY,tag));
     }
 
     @Override
@@ -117,7 +116,10 @@ public class HashTagListController extends Controller{
                 JSONArray photosJSON;
                 try {
                     photos.clear();
-                    photosJSON = response.getJSONObject("tag").getJSONObject("top_posts").getJSONArray("nodes");
+                    JSONObject pageInfo = response.getJSONObject("tag").getJSONObject("media").getJSONObject("page_info");
+                    moreAvailable = pageInfo.getBoolean("has_next_page");
+                    endId = pageInfo.getString("end_cursor");
+                    photosJSON = response.getJSONObject("tag").getJSONObject("media").getJSONArray("nodes");
                     for (int i = 0; i < photosJSON.length(); i++) {
                         InstagramPhoto photo = new InstagramPhoto();
                         photo.fromJSONHashTagList(photosJSON.getJSONObject(i));
@@ -138,7 +140,6 @@ public class HashTagListController extends Controller{
                 Log.d("katyagram",statusCode + responseString);
             }
         });
-
     }
 
     class HashTagTopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

@@ -31,7 +31,13 @@ public class HashTagController extends Controller {
         pagerAdapter = new ControllerPagerAdapter(this, false) {
             @Override
             public Controller getItem(int position) {
-                return new HashTagListController(tag);
+                switch (position) {
+                    default:
+                    case 0:
+                        return new HashTagListTopChildController(tag);
+                    case 1:
+                        return new HashTagListLastChildController(tag);
+                }
             }
 
             @Override
@@ -41,7 +47,13 @@ public class HashTagController extends Controller {
 
             @Override
             public CharSequence getPageTitle(int position) {
-                return "Page " + position;
+                switch (position) {
+                    default:
+                    case 0:
+                        return "Top";
+                    case 1:
+                        return "Last";
+                }
             }
         };
     }

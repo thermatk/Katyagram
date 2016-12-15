@@ -39,6 +39,7 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
+import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundleWithString;
 import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkAuthor;
 import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkHashtags;
 import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkMentions;
@@ -49,6 +50,7 @@ public class PhotoController extends Controller{
     private CommentsAdapter aComments;
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout swipeContainer;
+    private final static String BUNDLE_KEY = "code";
     private String code;
 
 
@@ -63,14 +65,8 @@ public class PhotoController extends Controller{
         super(args);
     }
 
-    public PhotoController(String user) {
-        this(createBundle(user));
-    }
-
-    public static Bundle createBundle (String code) {
-        Bundle b = new Bundle();
-        b.putString("code", code);
-        return b;
+    public PhotoController(String code) {
+        this(createBundleWithString(BUNDLE_KEY,code));
     }
 
     @Override
@@ -78,7 +74,7 @@ public class PhotoController extends Controller{
         View view = inflater.inflate(R.layout.controller_photo, container, false);
         Context ctx = view.getContext();
 
-        code = getArgs().getString("code");
+        code = getArgs().getString(BUNDLE_KEY);
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
 
 
