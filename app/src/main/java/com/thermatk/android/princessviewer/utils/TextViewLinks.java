@@ -26,9 +26,9 @@ public class TextViewLinks {
                 .setBold(false)
                 .setOnClickListener(clk);
     }
-
+    // http://blog.jstassen.com/2016/03/code-regex-for-instagram-username-and-hashtags/
     public static Link setupLinkMentions(Context ctx, Link.OnClickListener clk) {
-        return new Link(Pattern.compile("(@\\w+)"))
+        return new Link(Pattern.compile("(?:@)([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\\.(?!\\.))){0,28}(?:[A-Za-z0-9_]))?)"))
                 .setTextColor(ContextCompat.getColor(ctx, R.color.instagram_bold_font))
                 .setUnderlined(false)
                 .setBold(false)
