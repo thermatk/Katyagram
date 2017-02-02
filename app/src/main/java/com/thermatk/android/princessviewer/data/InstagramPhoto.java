@@ -23,6 +23,9 @@ public class InstagramPhoto {
     public int likesCount;
     public int commentsCount;
 
+    public boolean isVideo;
+    public String videoUrl;
+
     public void fromJSONHashTagList(JSONObject photoJSON) throws JSONException {
         // caption may be null
         if (photoJSON.has("caption") && !photoJSON.isNull("caption")) {
@@ -75,6 +78,10 @@ public class InstagramPhoto {
             caption = photoJSON.getJSONObject("caption").getString("text");
         }
         createdTime = photoJSON.getString("created_time");
+        isVideo = photoJSON.getString("type").equals("video");
+        if (isVideo) {
+            videoUrl = photoJSON.getJSONObject("videos").getJSONObject("standard_resolution").getString("url");
+        }
         imageUrl = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getString("url");
         imageHeight = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getInt("height");
         likesCount = photoJSON.getJSONObject("likes").getInt("count");

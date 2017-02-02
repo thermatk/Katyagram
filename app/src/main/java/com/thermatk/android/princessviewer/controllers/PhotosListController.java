@@ -1,6 +1,7 @@
 package com.thermatk.android.princessviewer.controllers;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -15,9 +16,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.bluelinelabs.conductor.Controller;
 import com.bluelinelabs.conductor.ControllerChangeHandler;
@@ -268,7 +271,7 @@ public class PhotosListController extends Controller{
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
             if (holder instanceof PhotoViewHolder) {
-                InstagramPhoto photo = photos.get(position);
+                final InstagramPhoto photo = photos.get(position);
 
                 final String code = photo.code;
 
@@ -421,6 +424,7 @@ public class PhotosListController extends Controller{
                 // use device width for photo height
                 DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
                 photoViewHolder.imgPhoto.getLayoutParams().height = displayMetrics.widthPixels;
+                photoViewHolder.videoView.getLayoutParams().height = displayMetrics.widthPixels;
 
                 // Reset the images from the recycled view
                 photoViewHolder.imgProfile.setImageResource(0);
@@ -429,14 +433,34 @@ public class PhotosListController extends Controller{
                 // Ask for the photo to be added to the imageview based on the photo url
                 // Background: Send a network request to the url, download the image bytes, convert into bitmap, insert bitmap into the imageview
                 Picasso.with(ctx).load(photo.profileUrl).into(photoViewHolder.imgProfile);
+                // TODO: could be video
+                if (photo.isVideo == true) {
+                    Log.d("katyagram", "a video is here" + photo.code);
+
+                    MediaController mc = new MediaController(getActivity());
+                    mc.setAnchorView(photoViewHolder.videoView);
+                    mc.setMediaPlayer(photoViewHolder.videoView);
+                    Uri uri = Uri.parse(photo.videoUrl);
+                    photoViewHolder.videoView.setMediaController(mc);
+                    photoViewHolder.videoView.setVideoURI(uri);
+                    //photoViewHolder.videoView.setZOrderMediaOverlay(true);
+                    photoViewHolder.videoView.setZOrderOnTop(true);
+                }
                 Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
                 photoViewHolder.imgPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        getRouter().pushController(
-                                RouterTransaction.with(new PhotoController(code))
-                                        .pushChangeHandler(new FadeChangeHandler())
-                                        .popChangeHandler(new FadeChangeHandler()));
+                        if (photo.isVideo) {
+                            // TODO: fix and rewrite video
+                            photoViewHolder.imgPhoto.setVisibility(View.GONE);
+                            photoViewHolder.videoView.setVisibility(View.VISIBLE);
+                            photoViewHolder.videoView.start();
+                        } else {
+                            getRouter().pushController(
+                                    RouterTransaction.with(new PhotoController(code))
+                                            .pushChangeHandler(new FadeChangeHandler())
+                                            .popChangeHandler(new FadeChangeHandler()));
+                        }
                     }
                 });
 
@@ -465,6 +489,8 @@ public class PhotosListController extends Controller{
             public TextView tvComment1;
             public TextView  tvComment2;
 
+            public VideoView videoView;
+
             public PhotoViewHolder(View itemView) {
                 super(itemView);
                 // Lookup the subview within the template
@@ -477,6 +503,8 @@ public class PhotosListController extends Controller{
                 tvViewAllComments = (TextView) itemView.findViewById(R.id.tvViewAllComments);
                 tvComment1 = (TextView) itemView.findViewById(R.id.tvComment1);
                 tvComment2 = (TextView) itemView.findViewById(R.id.tvComment2);
+
+                videoView = (VideoView) itemView.findViewById(R.id.vidView);
             }
         }
 
