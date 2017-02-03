@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!router.hasRootController()) {
-            router.setRoot(RouterTransaction.with(new PhotosListController("katekoti")));
+            router.setRoot(RouterTransaction.with(new PhotosListController("echomsk")));
         }
 
     }

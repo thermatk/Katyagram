@@ -11,24 +11,35 @@
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:paddingBottom="8dp">
 
-        <ImageView
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            android:id="@+id/imgPhoto"
-            android:src="@mipmap/ic_launcher"
             android:layout_below="@+id/imgProfile"
-            android:layout_alignParentStart="true" />
-        <VideoView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            android:layout_below="@+id/imgProfile"
-            android:layout_alignParentStart="true"
-            android:id="@+id/vidView"
-            android:visibility="gone"/>
+            android:id="@+id/imgLay"
+            android:layout_alignParentStart="true" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:id="@+id/imgPhoto"
+                android:src="@mipmap/ic_launcher"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:id="@+id/imgPhotoPlay"
+                android:src="@drawable/ic_play_circle"
+                android:tint="#FFFFFF"
+                android:background="#00FFFFFF"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -37,7 +48,7 @@
             android:ellipsize="end"
             android:text="@string/caption_default_text"
             android:id="@+id/tvCaption"
-            android:layout_below="@+id/imgPhoto"
+            android:layout_below="@+id/imgLay"
             android:layout_alignParentStart="true"
             android:paddingTop="4dp"
             android:paddingLeft="8dp"

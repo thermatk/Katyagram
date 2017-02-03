@@ -424,7 +424,6 @@ public class PhotosListController extends Controller{
                 // use device width for photo height
                 DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
                 photoViewHolder.imgPhoto.getLayoutParams().height = displayMetrics.widthPixels;
-                photoViewHolder.videoView.getLayoutParams().height = displayMetrics.widthPixels;
 
                 // Reset the images from the recycled view
                 photoViewHolder.imgProfile.setImageResource(0);
@@ -435,16 +434,8 @@ public class PhotosListController extends Controller{
                 Picasso.with(ctx).load(photo.profileUrl).into(photoViewHolder.imgProfile);
                 // TODO: could be video
                 if (photo.isVideo == true) {
-                    Log.d("katyagram", "a video is here" + photo.code);
-
-                    MediaController mc = new MediaController(getActivity());
-                    mc.setAnchorView(photoViewHolder.videoView);
-                    mc.setMediaPlayer(photoViewHolder.videoView);
                     Uri uri = Uri.parse(photo.videoUrl);
-                    photoViewHolder.videoView.setMediaController(mc);
-                    photoViewHolder.videoView.setVideoURI(uri);
-                    //photoViewHolder.videoView.setZOrderMediaOverlay(true);
-                    photoViewHolder.videoView.setZOrderOnTop(true);
+                    photoViewHolder.imgPhotoPlay.setVisibility(View.VISIBLE);
                 }
                 Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
                 photoViewHolder.imgPhoto.setOnClickListener(new View.OnClickListener() {
@@ -452,9 +443,7 @@ public class PhotosListController extends Controller{
                     public void onClick(View view) {
                         if (photo.isVideo) {
                             // TODO: fix and rewrite video
-                            photoViewHolder.imgPhoto.setVisibility(View.GONE);
-                            photoViewHolder.videoView.setVisibility(View.VISIBLE);
-                            photoViewHolder.videoView.start();
+                            //photoViewHolder.imgPhoto.setVisibility(View.GONE);
                         } else {
                             getRouter().pushController(
                                     RouterTransaction.with(new PhotoController(code))
@@ -489,7 +478,7 @@ public class PhotosListController extends Controller{
             public TextView tvComment1;
             public TextView  tvComment2;
 
-            public VideoView videoView;
+            public ImageView imgPhotoPlay;
 
             public PhotoViewHolder(View itemView) {
                 super(itemView);
@@ -504,7 +493,7 @@ public class PhotosListController extends Controller{
                 tvComment1 = (TextView) itemView.findViewById(R.id.tvComment1);
                 tvComment2 = (TextView) itemView.findViewById(R.id.tvComment2);
 
-                videoView = (VideoView) itemView.findViewById(R.id.vidView);
+                imgPhotoPlay = (ImageView) itemView.findViewById(R.id.imgPhotoPlay);
             }
         }
 
