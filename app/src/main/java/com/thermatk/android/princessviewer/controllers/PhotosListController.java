@@ -432,9 +432,8 @@ public class PhotosListController extends Controller{
                 // Ask for the photo to be added to the imageview based on the photo url
                 // Background: Send a network request to the url, download the image bytes, convert into bitmap, insert bitmap into the imageview
                 Picasso.with(ctx).load(photo.profileUrl).into(photoViewHolder.imgProfile);
-                // TODO: could be video
+                // show overlay if a video
                 if (photo.isVideo == true) {
-                    Uri uri = Uri.parse(photo.videoUrl);
                     photoViewHolder.imgPhotoPlay.setVisibility(View.VISIBLE);
                 }
                 Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
@@ -443,6 +442,11 @@ public class PhotosListController extends Controller{
                     public void onClick(View view) {
                         if (photo.isVideo) {
                             // TODO: fix and rewrite video
+                            getRouter().pushController(
+                                    RouterTransaction.with(new VideoPlayController(photo.videoUrl))
+                                            .pushChangeHandler(new FadeChangeHandler())
+                                            .popChangeHandler(new FadeChangeHandler()));
+
                             //photoViewHolder.imgPhoto.setVisibility(View.GONE);
                         } else {
                             getRouter().pushController(
