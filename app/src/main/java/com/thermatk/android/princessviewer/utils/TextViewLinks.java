@@ -20,6 +20,7 @@ public class TextViewLinks {
     }
 
     public static Link setupLinkHashtags(Context ctx, Link.OnClickListener clk) {
+        // return new Link(Pattern.compile("#([^#\\s@]*[^.\\s])+"))
         return new Link(Pattern.compile("(#\\w+)"))
                 .setTextColor(ContextCompat.getColor(ctx, R.color.instagram_bold_font))
                 .setUnderlined(false)
