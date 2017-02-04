@@ -435,11 +435,15 @@ public class PhotosListController extends Controller{
                 // show overlay if a video
                 if (photo.isVideo == true) {
                     photoViewHolder.imgPhotoPlay.setVisibility(View.VISIBLE);
+                } else {
+                    photoViewHolder.imgPhotoPlay.setVisibility(View.GONE);
                 }
                 Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
                 photoViewHolder.imgPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        // retain in case it's a one-off thing
+                        // TODO: better retain handling
                         setRetainViewMode(RetainViewMode.RETAIN_DETACH);
                         if (photo.isVideo) {
                             // TODO: fix and rewrite video

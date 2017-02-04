@@ -93,9 +93,8 @@ public class VideoPlayController extends Controller{
     @Override
     protected void onChangeStarted(@NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
         setOptionsMenuHidden(!changeType.isEnter);
-
         if (changeType.isEnter) {
-            Log.d("katyagram", "first opening");
+            Log.d("katyagram", "first creating");
         }
     }
 
@@ -105,6 +104,14 @@ public class VideoPlayController extends Controller{
         Log.d("kg", player.getVideoFormat().toString() + player.getVideoScalingMode() + player.getVideoDecoderCounters().toString() + player.getVideoFormat().frameRate);
         player.release();
         super.onDetach(view);
+    }
+
+
+    @Override
+    protected void onDestroyView(View view) {
+
+        Log.d("kg", "VIEW DESTROYED");
+        super.onDestroyView(view);
     }
 
 }
