@@ -41,4 +41,6 @@ dependencies {
     compile 'com.bluelinelabs:conductor-support:2.0.7'
 
     compile 'com.google.code.gson:gson:2.8.0'
+
+    compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
 }

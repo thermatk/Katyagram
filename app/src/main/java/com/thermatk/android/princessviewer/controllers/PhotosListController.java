@@ -440,6 +440,7 @@ public class PhotosListController extends Controller{
                 photoViewHolder.imgPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        setRetainViewMode(RetainViewMode.RETAIN_DETACH);
                         if (photo.isVideo) {
                             // TODO: fix and rewrite video
                             getRouter().pushController(
