@@ -92,3 +92,10 @@
 -keep class * implements com.google.gson.JsonDeserializer
 
 ##---------------End: proguard configuration for Gson  ----------
+# exoplayer
+-keepclassmembers class com.google.android.exoplayer2.text.cea.Cea608Decoder {
+    public <init>(java.lang.String, int);
+}
+-keepclassmembers class com.google.android.exoplayer2.text.cea.Cea708Decoder {
+    public <init>(int);
+}
