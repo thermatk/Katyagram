@@ -26,8 +26,6 @@ import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.klinker.android.link_builder.Link;
 import com.klinker.android.link_builder.LinkBuilder;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.instaviewer.R;
 import com.thermatk.android.instaviewer.activities.MainActivity;
@@ -36,17 +34,12 @@ import com.thermatk.android.instaviewer.data.model.Node;
 import com.thermatk.android.instaviewer.data.model.PhotosList;
 import com.thermatk.android.instaviewer.interfaces.ILoadMore;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import cz.msebera.android.httpclient.Header;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -63,13 +56,13 @@ public class PhotosListController extends Controller{
 
     private MainActivity activity;
 
-    private ArrayList<InstagramPhoto> photos;
     private PhotosList photosList;
     private List<Node> photosNodes;
     private PhotosAdapter aPhotos;
     private boolean moreAvailable;
     private final static String BUNDLE_KEY = "user";
     private String user;
+    private String maxId;
 
     public PhotosListController(@Nullable Bundle args) {
         super(args);
@@ -86,6 +79,7 @@ public class PhotosListController extends Controller{
         Context ctx = view.getContext();
 
         user = getArgs().getString("user");
+        maxId = "";
 
         activity = (MainActivity) getRouter().getActivity();
 
@@ -101,7 +95,6 @@ public class PhotosListController extends Controller{
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        photos = new ArrayList<>();
         photosNodes = new ArrayList<>();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
@@ -113,21 +106,21 @@ public class PhotosListController extends Controller{
         aPhotos.setOnLoadMoreListener(new ILoadMore() {
             @Override
             public void onLoadMore() {
-                Log.e("katyagram", "Load More");
+                Log.d("katyagram", "Load More");
                 if (moreAvailable) {
-                    photos.add(null);
+                    photosNodes.add(null);
                     Handler handler = new Handler();
                     handler.post(new Runnable() {
                         public void run() {
-                            aPhotos.notifyItemInserted(photos.size() - 1);
+                            aPhotos.notifyItemInserted(photosNodes.size() - 1);
                         }
                     });
-                    fetchPhotosAdditional(photos.get(photos.size() - 2).id);
+                    fetchMorePhotos();
                 }
             }
         });
 
-        fetchPhotosInitial();
+        fetchPhotos();
         return view;
     }
 
@@ -151,15 +144,37 @@ public class PhotosListController extends Controller{
     private void fetchPhotos() {
         photosNodes.add(null);
         aPhotos.notifyItemInserted(photosNodes.size() - 1);
-        Call<PhotosList> photosListCall = activity.instaApiService.getPhotosList(user);
+
+        Call<PhotosList> photosListCall = activity.instaApiService.getPhotosList(user,maxId,1);
         photosListCall.enqueue(new Callback<PhotosList>() {
             @Override
             public void onResponse(Call<PhotosList> call, Response<PhotosList> response) {
 
                 if(response.isSuccessful()) {
-                    photosList = response.body();
                     Log.d("katyagram", "Api Success");
-                    showResponse();
+                    photosList = response.body();
+                    moreAvailable = photosList.getUser().getMedia().getPageInfo().getHasNextPage();
+                    maxId = photosList.getUser().getMedia().getPageInfo().getEndCursor();
+
+
+                    photosNodes.remove(photosNodes.size() - 1);
+                    aPhotos.notifyItemRemoved(photosNodes.size());
+
+
+                    photosNodes = photosList.getUser().getMedia().getNodes();
+
+                    // notify adapter
+                    if(photosNodes.size() == 0) {
+                        Log.d("katyagram", "Private profile");
+                        Toast.makeText(getApplicationContext(),
+                                R.string.error_restricted, Toast.LENGTH_LONG).show();
+                        getRouter().handleBack();
+                    }
+
+                    aPhotos.notifyDataSetChanged();
+                    aPhotos.setLoaded();
+
+                    swipeContainer.setRefreshing(false);
                 }
             }
 
@@ -170,114 +185,34 @@ public class PhotosListController extends Controller{
         });
     }
 
-    private void showResponse(){
-        photosNodes.remove(photosNodes.size() - 1);
-        aPhotos.notifyItemRemoved(photosNodes.size());
+    private void fetchMorePhotos() {
 
-
-        photosNodes = photosList.getUser().getMedia().getNodes();
-
-        // notify adapter
-        if(photosNodes.size() == 0) {
-            Log.d("katyagram", "Private profile");
-            Toast.makeText(getApplicationContext(),
-                    R.string.error_restricted, Toast.LENGTH_LONG).show();
-            getRouter().handleBack();
-        }
-
-        aPhotos.notifyDataSetChanged();
-        aPhotos.setLoaded();
-
-        swipeContainer.setRefreshing(false);
-    }
-
-
-    private void fetchPhotosInitial() {
-        photos.add(null);
-        aPhotos.notifyItemInserted(photos.size() - 1);
-
-        // do the network request
-        String popularUrl = "https://www.instagram.com/" +user+ "/media/";
-        Log.d("katyagram", popularUrl);
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(popularUrl, new JsonHttpResponseHandler() {
-            // define success and failure callbacks
+        Call<PhotosList> photosListCall = activity.instaApiService.getPhotosList(user,maxId,1);
+        photosListCall.enqueue(new Callback<PhotosList>() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                photos.remove(photos.size() - 1);
-                aPhotos.notifyItemRemoved(photos.size());
+            public void onResponse(Call<PhotosList> call, Response<PhotosList> response) {
 
-                JSONArray photosJSON;
-                try {
-                    moreAvailable = response.getBoolean("more_available");
-                    photos.clear();
-                    photosJSON = response.getJSONArray("items");
-                    for (int i = 0; i < photosJSON.length(); i++) {
-                        InstagramPhoto photo = new InstagramPhoto();
-                        photo.fromJSONMediaList(photosJSON.getJSONObject(i));
-                        photos.add(photo);
-                    }
-                    // notify adapter
-                    if(photos.size() == 0) {
-                        Log.d("katyagram", "Private profile");
-                        Toast.makeText(getApplicationContext(),
-                                R.string.error_restricted, Toast.LENGTH_LONG).show();
-                        getRouter().handleBack();
-                    }
-                    aPhotos.notifyDataSetChanged();
-                    aPhotos.setLoaded();
-                } catch (JSONException e ) {
-                    // json failed
-                    e.printStackTrace();
-                }
-                swipeContainer.setRefreshing(false);
-            }
+                if(response.isSuccessful()) {
+                    Log.d("katyagram", "Api Success");
+                    photosNodes.remove(photosNodes.size() - 1);
+                    aPhotos.notifyItemRemoved(photosNodes.size());
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                //Log.d("katyagram",statusCode + responseString);
-            }
-        });
+                    photosList = response.body();
+                    photosNodes.addAll(photosList.getUser().getMedia().getNodes());
 
-    }
-
-    private void fetchPhotosAdditional(String maxId) {
-
-        // do the network request
-        String popularUrl = "https://www.instagram.com/" +user+ "/media/?max_id="+maxId;
-        Log.d("katyagram" , "MORE" + popularUrl);
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(popularUrl, new JsonHttpResponseHandler() {
-            // define success and failure callbacks
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                photos.remove(photos.size() - 1);
-                aPhotos.notifyItemRemoved(photos.size());
-
-                JSONArray photosJSON;
-                try {
-                    moreAvailable = response.getBoolean("more_available");
-                    photosJSON = response.getJSONArray("items");
-                    for (int i = 0; i < photosJSON.length(); i++) {
-                        InstagramPhoto photo = new InstagramPhoto();
-                        photo.fromJSONMediaList(photosJSON.getJSONObject(i));
-                        photos.add(photo);
-                    }
+                    moreAvailable = photosList.getUser().getMedia().getPageInfo().getHasNextPage();
+                    maxId = photosList.getUser().getMedia().getPageInfo().getEndCursor();
                     // notify adapter
                     aPhotos.notifyDataSetChanged();
                     aPhotos.setLoaded();
-                } catch (JSONException e ) {
-                    // json failed
-                    e.printStackTrace();
                 }
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("katyagram",statusCode + responseString);
+            public void onFailure(Call<PhotosList> call, Throwable t) {
+                Log.d("katyagram", "Api Failed");
             }
         });
-
     }
 
     class PhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
