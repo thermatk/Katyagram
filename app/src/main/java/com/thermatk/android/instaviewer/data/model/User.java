@@ -69,9 +69,6 @@ import lombok.Data;
     public Object connectedFbPage;
     @Expose
     public Media media;
-    @SerializedName("saved_media")
-    @Expose
-    public SavedMedia savedMedia;
     public final static Parcelable.Creator<User> CREATOR = new Creator<User>() {
 
 
@@ -111,7 +108,6 @@ import lombok.Data;
         this.username = ((String) in.readValue((String.class.getClassLoader())));
         this.connectedFbPage = ((Object) in.readValue((Object.class.getClassLoader())));
         this.media = ((Media) in.readValue((Media.class.getClassLoader())));
-        this.savedMedia = ((SavedMedia) in.readValue((SavedMedia.class.getClassLoader())));
     }
 
     public void writeToParcel(Parcel dest, int flags) {
@@ -136,7 +132,6 @@ import lombok.Data;
         dest.writeValue(username);
         dest.writeValue(connectedFbPage);
         dest.writeValue(media);
-        dest.writeValue(savedMedia);
     }
 
     public int describeContents() {

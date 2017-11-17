@@ -1,5 +1,8 @@
 package com.thermatk.android.instaviewer.data.remote;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import lombok.NoArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -18,10 +21,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
                     .setLevel(logging ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE))
                     .build();
 
+            Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .create();
+
             retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .client(client)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }
         return retrofit;
