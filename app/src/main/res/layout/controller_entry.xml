@@ -28,6 +28,7 @@
             android:imeActionLabel="username"
             android:imeOptions="actionGo"
             android:hint="Enter an account username to start from"
+            android:inputType="text"
             android:maxLines="1" />
 
     </android.support.design.widget.TextInputLayout>

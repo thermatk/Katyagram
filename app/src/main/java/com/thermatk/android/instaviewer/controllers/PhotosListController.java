@@ -30,7 +30,10 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.instaviewer.R;
+import com.thermatk.android.instaviewer.activities.MainActivity;
 import com.thermatk.android.instaviewer.data.InstagramPhoto;
+import com.thermatk.android.instaviewer.data.model.Node;
+import com.thermatk.android.instaviewer.data.model.PhotosList;
 import com.thermatk.android.instaviewer.interfaces.ILoadMore;
 
 import org.json.JSONArray;
@@ -38,11 +41,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import cz.msebera.android.httpclient.Header;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
 import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkAuthor;
@@ -54,7 +61,11 @@ public class PhotosListController extends Controller{
     @BindView(R.id.lvPhotos) RecyclerView mRecyclerView;
     @BindView(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
 
+    private MainActivity activity;
+
     private ArrayList<InstagramPhoto> photos;
+    private PhotosList photosList;
+    private List<Node> photosNodes;
     private PhotosAdapter aPhotos;
     private boolean moreAvailable;
     private final static String BUNDLE_KEY = "user";
@@ -76,10 +87,12 @@ public class PhotosListController extends Controller{
 
         user = getArgs().getString("user");
 
+        activity = (MainActivity) getRouter().getActivity();
+
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetchPhotosInitial();
+                fetchPhotos();
             }
         });
 
@@ -89,6 +102,7 @@ public class PhotosListController extends Controller{
                 android.R.color.holo_red_light);
 
         photos = new ArrayList<>();
+        photosNodes = new ArrayList<>();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
 
@@ -132,6 +146,49 @@ public class PhotosListController extends Controller{
         if (changeType.isEnter) {
             Log.d("katyagram", "first opening");
         }
+    }
+
+    private void fetchPhotos() {
+        photosNodes.add(null);
+        aPhotos.notifyItemInserted(photosNodes.size() - 1);
+        Call<PhotosList> photosListCall = activity.instaApiService.getPhotosList(user);
+        photosListCall.enqueue(new Callback<PhotosList>() {
+            @Override
+            public void onResponse(Call<PhotosList> call, Response<PhotosList> response) {
+
+                if(response.isSuccessful()) {
+                    photosList = response.body();
+                    Log.d("katyagram", "Api Success");
+                    showResponse();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PhotosList> call, Throwable t) {
+                Log.d("katyagram", "Api Failed");
+            }
+        });
+    }
+
+    private void showResponse(){
+        photosNodes.remove(photosNodes.size() - 1);
+        aPhotos.notifyItemRemoved(photosNodes.size());
+
+
+        photosNodes = photosList.getUser().getMedia().getNodes();
+
+        // notify adapter
+        if(photosNodes.size() == 0) {
+            Log.d("katyagram", "Private profile");
+            Toast.makeText(getApplicationContext(),
+                    R.string.error_restricted, Toast.LENGTH_LONG).show();
+            getRouter().handleBack();
+        }
+
+        aPhotos.notifyDataSetChanged();
+        aPhotos.setLoaded();
+
+        swipeContainer.setRefreshing(false);
     }
 
 
@@ -261,7 +318,7 @@ public class PhotosListController extends Controller{
 
         @Override
         public int getItemViewType(int position) {
-            return photos.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
+            return photosNodes.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
         }
 
         @Override
@@ -279,7 +336,7 @@ public class PhotosListController extends Controller{
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
             if (holder instanceof PhotoViewHolder) {
-                final InstagramPhoto photo = photos.get(position);
+                final Node photo = photosNodes.get(position);
 
                 final String code = photo.code;
 
@@ -287,17 +344,16 @@ public class PhotosListController extends Controller{
 
 
                 // Populate the subviews (textfield, imageview) with the correct data
-                photoViewHolder.tvUsername.setText(photo.username);
+                photoViewHolder.tvUsername.setText(photosList.getUser().getUsername());
 
                 Context ctx = photoViewHolder.tvCaption.getContext();
 
                 photoViewHolder.tvTime.setText(
-                        DateUtils.getRelativeTimeSpanString(
-                                Long.parseLong(photo.createdTime)*1000,
+                        DateUtils.getRelativeTimeSpanString(photo.getDate()*1000,
                                 System.currentTimeMillis(),
                                 DateUtils.MINUTE_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_RELATIVE));
-                photoViewHolder.tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.likesCount));
+                photoViewHolder.tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.getLikes().getCount()));
                 if (photo.caption != null) {
                     photoViewHolder.tvCaption.setText(photo.caption);
 
@@ -329,13 +385,13 @@ public class PhotosListController extends Controller{
                     photoViewHolder.tvCaption.setVisibility(View.GONE);
                 }
                 final int curPos = position;
-                if (photo.commentsCount > 0) {
-                    photoViewHolder.tvViewAllComments.setText(String.format("\uD83D\uDCAD (%d):", photo.commentsCount));
+                if (photo.getComments().getCount() > 0) {
+                    photoViewHolder.tvViewAllComments.setText(String.format("\uD83D\uDCAD (%d)", photo.getComments().getCount()));
                     // set click handler for view all comments
                     photoViewHolder.tvViewAllComments.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            InstagramPhoto photo = photos.get(curPos);
+                            Node photo = photosNodes.get(curPos);
                             getRouter().pushController(
                                     RouterTransaction.with(new PhotoController(photo.code))
                                             .pushChangeHandler(new FadeChangeHandler())
@@ -345,88 +401,6 @@ public class PhotosListController extends Controller{
                     photoViewHolder.tvViewAllComments.setVisibility(View.VISIBLE);
                 } else {
                     photoViewHolder.tvViewAllComments.setVisibility(View.GONE);
-                }
-
-                // Set last 2 comments
-                if (photo.comment1 != null) {
-                    photoViewHolder.tvComment1.setText(photo.user1 + " " + photo.comment1);
-                    LinkBuilder.on(photoViewHolder.tvComment1)
-                            .addLink(setupLinkHashtags(ctx, new Link.OnClickListener() {
-                                @Override
-                                public void onClick(String clickedText) {
-                                    // single clicked
-                                    //
-                                    getRouter().pushController(
-                                            RouterTransaction.with(new HashTagController(clickedText.substring(1)))
-                                                    .pushChangeHandler(new FadeChangeHandler())
-                                                    .popChangeHandler(new FadeChangeHandler()));
-                                }
-                            }))
-                            .addLink(setupLinkMentions(ctx, new Link.OnClickListener() {
-                                @Override
-                                public void onClick(String clickedText) {
-                                    // single clicked
-                                    getRouter().pushController(
-                                            RouterTransaction.with(new PhotosListController(clickedText.substring(1)))
-                                                    .pushChangeHandler(new FadeChangeHandler())
-                                                    .popChangeHandler(new FadeChangeHandler()));
-                                }
-                            }))
-                            .addLink(setupLinkAuthor(photo.user1, ctx, new Link.OnClickListener() {
-                                @Override
-                                public void onClick(String clickedText) {
-                                    // single clicked
-                                    getRouter().pushController(
-                                            RouterTransaction.with(new PhotosListController(clickedText))
-                                                    .pushChangeHandler(new FadeChangeHandler())
-                                                    .popChangeHandler(new FadeChangeHandler()));
-                                }
-                            }))
-                            .build();
-                    photoViewHolder.tvComment1.setVisibility(View.VISIBLE);
-                } else {
-                    photoViewHolder.tvComment1.setVisibility(View.GONE);
-                }
-
-                if (photo.comment2 != null) {
-                    photoViewHolder.tvComment2.setText(photo.user2 + " " + photo.comment2);
-                    LinkBuilder.on(photoViewHolder.tvComment2)
-                            .addLink(setupLinkHashtags(ctx,new Link.OnClickListener() {
-                                @Override
-                                public void onClick(String clickedText) {
-                                    // single clicked
-                                    //
-                                    getRouter().pushController(
-                                            RouterTransaction.with(new HashTagController(clickedText.substring(1)))
-                                                    .pushChangeHandler(new FadeChangeHandler())
-                                                    .popChangeHandler(new FadeChangeHandler()));
-                                }
-                            }))
-                            .addLink(setupLinkMentions(ctx,new Link.OnClickListener() {
-                                @Override
-                                public void onClick(String clickedText) {
-                                    // single clicked
-                                    getRouter().pushController(
-                                            RouterTransaction.with(new PhotosListController(clickedText.substring(1)))
-                                                    .pushChangeHandler(new FadeChangeHandler())
-                                                    .popChangeHandler(new FadeChangeHandler()));
-                                }
-                            }))
-                            .addLink(setupLinkAuthor(photo.user2, ctx,new Link.OnClickListener() {
-                                @Override
-                                public void onClick(String clickedText) {
-                                    // single clicked
-                                    getRouter().pushController(
-                                            RouterTransaction.with(new PhotosListController(clickedText))
-                                                    .pushChangeHandler(new FadeChangeHandler())
-                                                    .popChangeHandler(new FadeChangeHandler()));
-                                }
-                            }))
-                            .build();
-
-                    photoViewHolder.tvComment2.setVisibility(View.VISIBLE);
-                } else {
-                    photoViewHolder.tvComment2.setVisibility(View.GONE);
                 }
 
                 // use device width for photo height
@@ -439,14 +413,14 @@ public class PhotosListController extends Controller{
 
                 // Ask for the photo to be added to the imageview based on the photo url
                 // Background: Send a network request to the url, download the image bytes, convert into bitmap, insert bitmap into the imageview
-                Picasso.with(ctx).load(photo.profileUrl).into(photoViewHolder.imgProfile);
+                Picasso.with(ctx).load(photosList.getUser().getProfilePicUrlHd()).into(photoViewHolder.imgProfile);
                 // show overlay if a video
                 if (photo.isVideo == true) {
                     photoViewHolder.imgPhotoPlay.setVisibility(View.VISIBLE);
                 } else {
                     photoViewHolder.imgPhotoPlay.setVisibility(View.GONE);
                 }
-                Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
+                Picasso.with(ctx).load(photo.getDisplaySrc()).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
                 photoViewHolder.imgPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -456,7 +430,8 @@ public class PhotosListController extends Controller{
                         if (photo.isVideo) {
                             // TODO: fix and rewrite video
                             getRouter().pushController(
-                                    RouterTransaction.with(new VideoPlayController(photo.videoUrl))
+                                    // TODO: check video how
+                                    RouterTransaction.with(new VideoPlayController(photo.getDisplaySrc()))
                                             .pushChangeHandler(new FadeChangeHandler())
                                             .popChangeHandler(new FadeChangeHandler()));
 
@@ -478,12 +453,13 @@ public class PhotosListController extends Controller{
 
         @Override
         public int getItemCount() {
-            return photos == null ? 0 : photos.size();
+            return photosNodes == null ? 0 : photosNodes.size();
         }
 
         public void setLoaded() {
             isLoading = false;
         }
+
         class PhotoViewHolder extends RecyclerView.ViewHolder {
             public ImageView imgProfile;
             public ImageView imgPhoto;
@@ -492,8 +468,6 @@ public class PhotosListController extends Controller{
             public TextView tvLikes;
             public TextView tvCaption;
             public TextView tvViewAllComments;
-            public TextView tvComment1;
-            public TextView  tvComment2;
 
             public ImageView imgPhotoPlay;
 
@@ -507,8 +481,6 @@ public class PhotosListController extends Controller{
                 tvLikes = itemView.findViewById(R.id.tvLikes);
                 tvCaption = itemView.findViewById(R.id.tvCaption);
                 tvViewAllComments = itemView.findViewById(R.id.tvViewAllComments);
-                tvComment1 = itemView.findViewById(R.id.tvComment1);
-                tvComment2 = itemView.findViewById(R.id.tvComment2);
 
                 imgPhotoPlay = itemView.findViewById(R.id.imgPhotoPlay);
             }

@@ -1,19 +1,15 @@
 package com.thermatk.android.instaviewer.controllers;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.bluelinelabs.conductor.Controller;
 import com.bluelinelabs.conductor.ControllerChangeHandler;
@@ -25,6 +21,8 @@ import com.thermatk.android.instaviewer.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnEditorAction;
 import butterknife.Unbinder;
 
 import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
@@ -32,7 +30,6 @@ import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWit
 public class EntryController extends Controller{
     private Unbinder unbinder;
     @BindView(R.id.username) TextInputEditText mUsernameView;
-    @BindView(R.id.go_button) Button mSearchButton;
 
     private final static String BUNDLE_KEY = "code";
     private String code;
@@ -52,26 +49,10 @@ public class EntryController extends Controller{
 
         code = getArgs().getString(BUNDLE_KEY);
 
-        mUsernameView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.searchuser || id == EditorInfo.IME_NULL) {
-                    goToUser();
-                    return false;
-                }
-                return false;
-            }
-        });
-
-        mSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToUser();
-            }
-        });
-        //
         return view;
     }
+
+
 
     @Override
     protected void onDestroyView(@NonNull View view) {
@@ -80,7 +61,16 @@ public class EntryController extends Controller{
         unbinder = null;
     }
 
-    private void goToUser() {
+    @OnEditorAction(R.id.username)
+    protected boolean editorAction(int actionId) {
+        if (actionId == R.id.searchuser || actionId == EditorInfo.IME_NULL) {
+            goToUser();
+        }
+        return false;
+    }
+
+    @OnClick(R.id.go_button)
+    protected void goToUser() {
 
         // Reset errors.
         mUsernameView.setError(null);
