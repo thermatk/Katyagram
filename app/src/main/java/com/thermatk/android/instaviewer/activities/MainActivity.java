@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer.activities;
+package com.thermatk.android.instaviewer.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,12 +12,11 @@ import com.bluelinelabs.conductor.Router;
 import com.bluelinelabs.conductor.RouterTransaction;
 
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.thermatk.android.princessviewer.R;
-import com.thermatk.android.princessviewer.controllers.EntryController;
-import com.thermatk.android.princessviewer.controllers.PhotosListController;
-import com.thermatk.android.princessviewer.persist.FollowUser;
+import com.thermatk.android.instaviewer.R;
+import com.thermatk.android.instaviewer.controllers.EntryController;
+import com.thermatk.android.instaviewer.persist.FollowUser;
 
-import static com.thermatk.android.princessviewer.persist.PreferenceHelper.readFollowUsers;
+import static com.thermatk.android.instaviewer.persist.PreferenceHelper.readFollowUsers;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        container = (ViewGroup)findViewById(R.id.controller_container);
+        container = findViewById(R.id.controller_container);
 
         router = Conductor.attachRouter(this, container, savedInstanceState);
 
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         new DrawerBuilder().withActivity(this).build();
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

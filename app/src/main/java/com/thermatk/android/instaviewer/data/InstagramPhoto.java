@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer.data;
+package com.thermatk.android.instaviewer.data;
 
 import org.json.JSONArray;
 import org.json.JSONException;

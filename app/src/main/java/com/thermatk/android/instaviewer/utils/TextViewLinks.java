@@ -1,10 +1,10 @@
-package com.thermatk.android.princessviewer.utils;
+package com.thermatk.android.instaviewer.utils;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 
 import com.klinker.android.link_builder.Link;
-import com.thermatk.android.princessviewer.R;
+import com.thermatk.android.instaviewer.R;
 
 import java.util.regex.Pattern;
 

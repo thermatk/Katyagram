@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer.views;
+package com.thermatk.android.instaviewer.views;
 
 import android.content.Context;
 import android.util.AttributeSet;

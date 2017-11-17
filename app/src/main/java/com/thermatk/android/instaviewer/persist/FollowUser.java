@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer.persist;
+package com.thermatk.android.instaviewer.persist;
 
 public class FollowUser {
     public String username;

@@ -1,16 +1,11 @@
-package com.thermatk.android.princessviewer.controllers;
+package com.thermatk.android.instaviewer.controllers;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -18,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bluelinelabs.conductor.Controller;
@@ -27,28 +20,10 @@ import com.bluelinelabs.conductor.ControllerChangeHandler;
 import com.bluelinelabs.conductor.ControllerChangeType;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
-import com.klinker.android.link_builder.Link;
-import com.klinker.android.link_builder.LinkBuilder;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.mikepenz.materialdrawer.util.KeyboardUtil;
-import com.squareup.picasso.Picasso;
-import com.thermatk.android.princessviewer.R;
-import com.thermatk.android.princessviewer.data.Comment;
-import com.thermatk.android.princessviewer.data.InstagramPhoto;
+import com.thermatk.android.instaviewer.R;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
-import cz.msebera.android.httpclient.Header;
-
-import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundleWithString;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkAuthor;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkHashtags;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkMentions;
+import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
 
 public class EntryController extends Controller{
     private final static String BUNDLE_KEY = "code";
@@ -70,7 +45,7 @@ public class EntryController extends Controller{
 
         code = getArgs().getString(BUNDLE_KEY);
 
-        mUsernameView = (TextInputEditText) view.findViewById(R.id.username);
+        mUsernameView = view.findViewById(R.id.username);
 
         mUsernameView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -83,7 +58,7 @@ public class EntryController extends Controller{
             }
         });
 
-        Button mSearchButton = (Button) view.findViewById(R.id.go_button);
+        Button mSearchButton = view.findViewById(R.id.go_button);
         mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

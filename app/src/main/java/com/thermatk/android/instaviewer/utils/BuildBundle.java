@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer.utils;
+package com.thermatk.android.instaviewer.utils;
 
 import android.os.Bundle;
 

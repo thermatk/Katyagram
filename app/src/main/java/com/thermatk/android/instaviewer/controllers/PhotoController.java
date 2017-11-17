@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer.controllers;
+package com.thermatk.android.instaviewer.controllers;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -27,9 +27,9 @@ import com.klinker.android.link_builder.LinkBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
-import com.thermatk.android.princessviewer.R;
-import com.thermatk.android.princessviewer.data.Comment;
-import com.thermatk.android.princessviewer.data.InstagramPhoto;
+import com.thermatk.android.instaviewer.R;
+import com.thermatk.android.instaviewer.data.Comment;
+import com.thermatk.android.instaviewer.data.InstagramPhoto;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,10 +39,10 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundleWithString;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkAuthor;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkHashtags;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkMentions;
+import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
+import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkAuthor;
+import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkHashtags;
+import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkMentions;
 
 public class PhotoController extends Controller{
     private InstagramPhoto photo;
@@ -75,17 +75,17 @@ public class PhotoController extends Controller{
         Context ctx = view.getContext();
 
         code = getArgs().getString(BUNDLE_KEY);
-        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        swipeContainer = view.findViewById(R.id.swipeContainer);
 
 
 
-        imgProfileAuthor = (ImageView) view.findViewById(R.id.imgProfile);
-        imgPhoto = (ImageView) view.findViewById(R.id.imgPhoto);
-        tvUsername = (TextView) view.findViewById(R.id.tvUsername);
-        tvTime = (TextView) view.findViewById(R.id.tvTime);
-        tvLikes = (TextView) view.findViewById(R.id.tvLikes);
-        tvCaption = (TextView) view.findViewById(R.id.tvCaption);
-        tvViewAllComments = (TextView) view.findViewById(R.id.tvViewAllComments);
+        imgProfileAuthor = view.findViewById(R.id.imgProfile);
+        imgPhoto = view.findViewById(R.id.imgPhoto);
+        tvUsername = view.findViewById(R.id.tvUsername);
+        tvTime = view.findViewById(R.id.tvTime);
+        tvLikes = view.findViewById(R.id.tvLikes);
+        tvCaption = view.findViewById(R.id.tvCaption);
+        tvViewAllComments = view.findViewById(R.id.tvViewAllComments);
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -102,7 +102,7 @@ public class PhotoController extends Controller{
         comments = new ArrayList<>();
 
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.lvComments);
+        mRecyclerView = view.findViewById(R.id.lvComments);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
         mRecyclerView.setNestedScrollingEnabled(false);
 
@@ -389,9 +389,9 @@ public class PhotoController extends Controller{
                 super(itemView);
                 // Lookup the subview within the template
 
-                imgProfile = (ImageView) itemView.findViewById(R.id.imgCommentProfile);
-                tvComment = (TextView) itemView.findViewById(R.id.tvComment);
-                tvCommentTime = (TextView) itemView.findViewById(R.id.tvCommentTime);
+                imgProfile = itemView.findViewById(R.id.imgCommentProfile);
+                tvComment = itemView.findViewById(R.id.tvComment);
+                tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
             }
         }
 
@@ -400,7 +400,7 @@ public class PhotoController extends Controller{
 
             public LoadingViewHolder(View itemView) {
                 super(itemView);
-                progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar1);
+                progressBar = itemView.findViewById(R.id.progressBar1);
             }
         }
 

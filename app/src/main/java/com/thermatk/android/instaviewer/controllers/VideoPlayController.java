@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer.controllers;
+package com.thermatk.android.instaviewer.controllers;
 
 import android.content.Context;
 import android.net.Uri;
@@ -30,9 +30,9 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.thermatk.android.princessviewer.R;
+import com.thermatk.android.instaviewer.R;
 
-import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundleWithString;
+import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
 
 public class VideoPlayController extends Controller{
     private final static String BUNDLE_KEY = "link";
@@ -54,7 +54,7 @@ public class VideoPlayController extends Controller{
         Context ctx = view.getContext();
 
         link = getArgs().getString(BUNDLE_KEY);
-        playerView = (SimpleExoPlayerView) view.findViewById(R.id.player_view);
+        playerView = view.findViewById(R.id.player_view);
 
 
         // 1. Create a default TrackSelector

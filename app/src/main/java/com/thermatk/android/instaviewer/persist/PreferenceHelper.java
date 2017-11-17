@@ -1,4 +1,4 @@
-package com.thermatk.android.princessviewer.persist;
+package com.thermatk.android.instaviewer.persist;
 
 import android.content.Context;
 import android.content.SharedPreferences;

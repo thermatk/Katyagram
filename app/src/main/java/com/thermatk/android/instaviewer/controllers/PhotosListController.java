@@ -1,7 +1,6 @@
-package com.thermatk.android.princessviewer.controllers;
+package com.thermatk.android.instaviewer.controllers;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -16,11 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.bluelinelabs.conductor.Controller;
 import com.bluelinelabs.conductor.ControllerChangeHandler;
@@ -32,9 +29,9 @@ import com.klinker.android.link_builder.LinkBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
-import com.thermatk.android.princessviewer.R;
-import com.thermatk.android.princessviewer.data.InstagramPhoto;
-import com.thermatk.android.princessviewer.interfaces.ILoadMore;
+import com.thermatk.android.instaviewer.R;
+import com.thermatk.android.instaviewer.data.InstagramPhoto;
+import com.thermatk.android.instaviewer.interfaces.ILoadMore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,10 +41,10 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundleWithString;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkAuthor;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkHashtags;
-import static com.thermatk.android.princessviewer.utils.TextViewLinks.setupLinkMentions;
+import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
+import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkAuthor;
+import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkHashtags;
+import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkMentions;
 
 public class PhotosListController extends Controller{
     private ArrayList<InstagramPhoto> photos;
@@ -72,7 +69,7 @@ public class PhotosListController extends Controller{
         Context ctx = view.getContext();
 
         user = getArgs().getString("user");
-        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        swipeContainer = view.findViewById(R.id.swipeContainer);
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -89,7 +86,7 @@ public class PhotosListController extends Controller{
         photos = new ArrayList<>();
 
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.lvPhotos);
+        mRecyclerView = view.findViewById(R.id.lvPhotos);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
 
         aPhotos = new PhotosAdapter(LayoutInflater.from(ctx));
@@ -492,17 +489,17 @@ public class PhotosListController extends Controller{
             public PhotoViewHolder(View itemView) {
                 super(itemView);
                 // Lookup the subview within the template
-                imgProfile = (ImageView) itemView.findViewById(R.id.imgProfile);
-                imgPhoto = (ImageView) itemView.findViewById(R.id.imgPhoto);
-                tvUsername = (TextView) itemView.findViewById(R.id.tvUsername);
-                tvTime = (TextView) itemView.findViewById(R.id.tvTime);
-                tvLikes = (TextView) itemView.findViewById(R.id.tvLikes);
-                tvCaption = (TextView) itemView.findViewById(R.id.tvCaption);
-                tvViewAllComments = (TextView) itemView.findViewById(R.id.tvViewAllComments);
-                tvComment1 = (TextView) itemView.findViewById(R.id.tvComment1);
-                tvComment2 = (TextView) itemView.findViewById(R.id.tvComment2);
+                imgProfile = itemView.findViewById(R.id.imgProfile);
+                imgPhoto = itemView.findViewById(R.id.imgPhoto);
+                tvUsername = itemView.findViewById(R.id.tvUsername);
+                tvTime = itemView.findViewById(R.id.tvTime);
+                tvLikes = itemView.findViewById(R.id.tvLikes);
+                tvCaption = itemView.findViewById(R.id.tvCaption);
+                tvViewAllComments = itemView.findViewById(R.id.tvViewAllComments);
+                tvComment1 = itemView.findViewById(R.id.tvComment1);
+                tvComment2 = itemView.findViewById(R.id.tvComment2);
 
-                imgPhotoPlay = (ImageView) itemView.findViewById(R.id.imgPhotoPlay);
+                imgPhotoPlay = itemView.findViewById(R.id.imgPhotoPlay);
             }
         }
 
@@ -511,7 +508,7 @@ public class PhotosListController extends Controller{
 
             public LoadingViewHolder(View itemView) {
                 super(itemView);
-                progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar1);
+                progressBar = itemView.findViewById(R.id.progressBar1);
             }
         }
 

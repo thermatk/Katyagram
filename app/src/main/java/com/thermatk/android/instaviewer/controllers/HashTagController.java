@@ -1,6 +1,5 @@
-package com.thermatk.android.princessviewer.controllers;
+package com.thermatk.android.instaviewer.controllers;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,28 +13,38 @@ import android.view.ViewGroup;
 import com.bluelinelabs.conductor.Controller;
 import com.bluelinelabs.conductor.ControllerChangeHandler;
 import com.bluelinelabs.conductor.ControllerChangeType;
-import com.bluelinelabs.conductor.support.ControllerPagerAdapter;
-import com.thermatk.android.princessviewer.R;
+// https://github.com/bluelinelabs/Conductor/commit/a9bdf0dd06b5f2e0fd6a980cb0e86eb737cef457#diff-1219f1e886a4472258ed9221b8ccf78a
+import com.bluelinelabs.conductor.Router;
+import com.bluelinelabs.conductor.RouterTransaction;
+import com.bluelinelabs.conductor.support.RouterPagerAdapter;
+import com.thermatk.android.instaviewer.R;
 
-import static com.thermatk.android.princessviewer.utils.BuildBundle.createBundleWithString;
+import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
 
 public class HashTagController extends Controller {
     private String tag;
     private final static String BUNDLE_KEY = "tag";
     private ViewPager viewPager;
-    private final ControllerPagerAdapter pagerAdapter;
+    private final RouterPagerAdapter pagerAdapter;
 
     public HashTagController(@Nullable Bundle args) {
         super(args);
-        pagerAdapter = new ControllerPagerAdapter(this, false) {
+        pagerAdapter = new RouterPagerAdapter(this) {
             @Override
-            public Controller getItem(int position) {
-                switch (position) {
-                    default:
-                    case 0:
-                        return new HashTagListTopChildController(tag);
-                    case 1:
-                        return new HashTagListLastChildController(tag);
+            public void configureRouter(@NonNull Router router, int position) {
+                if (!router.hasRootController()) {
+                    Controller controller;
+
+                    switch (position) {
+                        case 0:
+                            controller = new HashTagListTopChildController(tag);
+                            break;
+                        default:
+                        case 1:
+                            controller = new HashTagListLastChildController(tag);
+                            break;
+                    }
+                    router.setRoot(RouterTransaction.with(controller));
                 }
             }
 
@@ -66,8 +75,8 @@ public class HashTagController extends Controller {
         View view = inflater.inflate(R.layout.controller_hashtag_pager, container, false);
         tag = getArgs().getString(BUNDLE_KEY);
 
-        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
-        viewPager = (ViewPager) view.findViewById(R.id.view_pager);
+        TabLayout tabLayout = view.findViewById(R.id.tab_layout);
+        viewPager = view.findViewById(R.id.view_pager);
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
