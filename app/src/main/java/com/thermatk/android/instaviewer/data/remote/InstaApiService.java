@@ -14,11 +14,12 @@ public interface InstaApiService {
     @GET("/{username}/")
     Call<PhotosList> getPhotosList(@Path("username") String username, @Query("max_id") String maxId, @Query("__a") int a);
 
-
     @GET("/p/{code}/")
     Call<OnePhoto> getPhoto(@Path("code") String code, @Query("__a") int a);
 
-
     @GET("/explore/tags/{tag}/")
-    Call<PhotosList> getHashTagList(@Path("tag") String tag, @Query("max_id") String maxId, @Query("__a") int a);
+    Call<PhotosList> getHashTagPhotoList(@Path("tag") String tag, @Query("max_id") String maxId, @Query("__a") int a);
+
+    @GET("/explore/locations/{locationId}/")
+    Call<PhotosList> getLocationPhotoList(@Path("locationId") String locationId, @Query("max_id") String maxId, @Query("__a") int a);
 }
