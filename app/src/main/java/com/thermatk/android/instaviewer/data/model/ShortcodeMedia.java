@@ -60,7 +60,7 @@ public class ShortcodeMedia {
     public Boolean commentsDisabled;
     @SerializedName("taken_at_timestamp")
     @Expose
-    public Integer takenAtTimestamp;
+    public long takenAtTimestamp;
     @SerializedName("edge_media_preview_like")
     @Expose
     public EdgeMediaPreviewLike edgeMediaPreviewLike;

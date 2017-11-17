@@ -17,7 +17,7 @@ public class NodeComments {
     public String text;
     @SerializedName("created_at")
     @Expose
-    public Integer createdAt;
+    public long createdAt;
     @Expose
     public Owner owner;
 }

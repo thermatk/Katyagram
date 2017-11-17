@@ -52,13 +52,14 @@ public class PhotosListController extends Controller{
     @BindView(R.id.lvPhotos) RecyclerView mRecyclerView;
     @BindView(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
 
+    private final static String BUNDLE_KEY = "user";
+
     private MainActivity activity;
 
     private PhotosList photosList;
     private List<Node> photosNodes;
     private PhotosAdapter aPhotos;
     private boolean moreAvailable;
-    private final static String BUNDLE_KEY = "user";
     private String user;
     private String maxId;
 
@@ -122,7 +123,6 @@ public class PhotosListController extends Controller{
         fetchPhotos();
         return view;
     }
-
 
     @Override
     protected void onDestroyView(@NonNull View view) {

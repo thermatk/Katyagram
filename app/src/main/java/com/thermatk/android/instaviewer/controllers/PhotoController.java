@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,20 +23,24 @@ import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.klinker.android.link_builder.Link;
 import com.klinker.android.link_builder.LinkBuilder;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.instaviewer.R;
-import com.thermatk.android.instaviewer.data.Comment;
-import com.thermatk.android.instaviewer.data.InstagramPhoto;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.thermatk.android.instaviewer.activities.MainActivity;
+import com.thermatk.android.instaviewer.data.model.EdgeComments;
+import com.thermatk.android.instaviewer.data.model.NodeComments;
+import com.thermatk.android.instaviewer.data.model.ShortcodeMedia;
+import com.thermatk.android.instaviewer.data.model.request.OnePhoto;
+import com.thermatk.android.instaviewer.data.remote.InstaApiService;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
 import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkAuthor;
@@ -45,22 +48,28 @@ import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkHash
 import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkMentions;
 
 public class PhotoController extends Controller{
-    private InstagramPhoto photo;
-    private ArrayList<Comment> comments;
-    private CommentsAdapter aComments;
-    private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout swipeContainer;
+    private Unbinder unbinder;
+    @BindView(R.id.lvComments) RecyclerView mRecyclerView;
+    @BindView(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
+    @BindView(R.id.imgProfile) ImageView imgProfileAuthor;
+    @BindView(R.id.imgPhoto) ImageView imgPhoto;
+    @BindView(R.id.tvUsername) TextView tvUsername;
+    @BindView(R.id.tvTime) TextView tvTime;
+    @BindView(R.id.tvLikes) TextView tvLikes;
+    @BindView(R.id.tvCaption) TextView tvCaption;
+    @BindView(R.id.tvViewAllComments) TextView tvViewAllComments;
+
     private final static String BUNDLE_KEY = "code";
+
+    private MainActivity activity;
+
+    private OnePhoto onePhoto;
+    private ShortcodeMedia photo;
+
+    private List<EdgeComments> comments;
+    private CommentsAdapter aComments;
     private String code;
 
-
-    private ImageView imgProfileAuthor;
-    private ImageView imgPhoto;
-    private TextView tvUsername;
-    private TextView tvTime;
-    private TextView tvLikes;
-    private TextView tvCaption;
-    private TextView tvViewAllComments;
     public PhotoController(@Nullable Bundle args) {
         super(args);
     }
@@ -72,20 +81,12 @@ public class PhotoController extends Controller{
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.controller_photo, container, false);
+        unbinder = ButterKnife.bind(this, view);
         Context ctx = view.getContext();
 
         code = getArgs().getString(BUNDLE_KEY);
-        swipeContainer = view.findViewById(R.id.swipeContainer);
 
-
-
-        imgProfileAuthor = view.findViewById(R.id.imgProfile);
-        imgPhoto = view.findViewById(R.id.imgPhoto);
-        tvUsername = view.findViewById(R.id.tvUsername);
-        tvTime = view.findViewById(R.id.tvTime);
-        tvLikes = view.findViewById(R.id.tvLikes);
-        tvCaption = view.findViewById(R.id.tvCaption);
-        tvViewAllComments = view.findViewById(R.id.tvViewAllComments);
+        activity = (MainActivity) getRouter().getActivity();
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -101,11 +102,9 @@ public class PhotoController extends Controller{
 
         comments = new ArrayList<>();
 
-
-        mRecyclerView = view.findViewById(R.id.lvComments);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
         mRecyclerView.setNestedScrollingEnabled(false);
-
+        mRecyclerView.setFocusable(false);
 
         aComments = new CommentsAdapter(LayoutInflater.from(ctx));
         mRecyclerView.setAdapter(aComments);
@@ -114,6 +113,13 @@ public class PhotoController extends Controller{
 
         fetchPhoto();
         return view;
+    }
+
+    @Override
+    protected void onDestroyView(@NonNull View view) {
+        super.onDestroyView(view);
+        unbinder.unbind();
+        unbinder = null;
     }
 
     @Override
@@ -135,9 +141,9 @@ public class PhotoController extends Controller{
 
         Context ctx = tvUsername.getContext();
         // Populate the subviews (textfield, imageview) with the correct data
-        tvUsername.setText(photo.username);
+        tvUsername.setText(photo.getOwner().getUsername());
         LinkBuilder.on(tvUsername)
-                .addLink(setupLinkAuthor(photo.username, ctx, new Link.OnClickListener() {
+                .addLink(setupLinkAuthor(photo.getOwner().getUsername(), ctx, new Link.OnClickListener() {
                     @Override
                     public void onClick(String clickedText) {
                         // single clicked
@@ -152,21 +158,21 @@ public class PhotoController extends Controller{
             @Override
             public void onClick(View view) {
                 getRouter().pushController(
-                        RouterTransaction.with(new PhotosListController(photo.username))
+                        RouterTransaction.with(new PhotosListController(photo.getOwner().getUsername()))
                                 .pushChangeHandler(new FadeChangeHandler())
                                 .popChangeHandler(new FadeChangeHandler()));
             }
         });
         tvTime.setText(
                 DateUtils.getRelativeTimeSpanString(
-                        Long.parseLong(photo.createdTime)*1000,
+                        photo.getTakenAtTimestamp()*1000,
                         System.currentTimeMillis(),
                         DateUtils.MINUTE_IN_MILLIS,
                         DateUtils.FORMAT_ABBREV_RELATIVE));
-        tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.likesCount));
+        tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.getEdgeMediaPreviewLike().getCount()));
 
-        if (photo.caption != null) {
-            tvCaption.setText(photo.caption);
+        if (photo.getEdgeMediaToCaption().getEdges().get(0).getNode().getText() != null) {
+            tvCaption.setText(photo.getEdgeMediaToCaption().getEdges().get(0).getNode().getText());
 
             LinkBuilder.on(tvCaption)
                     .addLink(setupLinkHashtags(ctx,new Link.OnClickListener() {
@@ -195,16 +201,12 @@ public class PhotoController extends Controller{
         } else {
             tvCaption.setVisibility(View.GONE);
         }
-        if (photo.commentsCount > 0) {
-            tvViewAllComments.setText(String.format("\uD83D\uDCAD (%d):", photo.commentsCount));
+        if (photo.getEdgeMediaToComment().getCount() > 0) {
+            tvViewAllComments.setText(String.format("\uD83D\uDCAD (%d):", photo.getEdgeMediaToComment().getCount()));
             tvViewAllComments.setVisibility(View.VISIBLE);
         } else {
             tvViewAllComments.setVisibility(View.GONE);
         }
-
-        // use device width for photo height
-        DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
-        imgPhoto.getLayoutParams().height = displayMetrics.widthPixels;
 
         // Reset the images from the recycled view
         imgProfileAuthor.setImageResource(0);
@@ -212,61 +214,43 @@ public class PhotoController extends Controller{
 
         // Ask for the photo to be added to the imageview based on the photo url
         // Background: Send a network request to the url, download the image bytes, convert into bitmap, insert bitmap into the imageview
-        Picasso.with(ctx).load(photo.profileUrl).into(imgProfileAuthor);
-        Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.ic_photo_camera).into(imgPhoto);
-
+        Picasso.with(ctx).load(photo.getOwner().getProfilePicUrl()).into(imgProfileAuthor);
+        Picasso.with(ctx).load(photo.getDisplayUrl()).placeholder(R.drawable.ic_photo_camera).into(imgPhoto);
     }
 
     private void fetchPhoto() {
         comments.add(null);
         aComments.notifyItemInserted(comments.size() - 1);
 
-        // do the network request
-        String popularUrl = "https://www.instagram.com/p/" + code + "/?__a=1";
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(popularUrl, new JsonHttpResponseHandler() {
-            // define success and failure callbacks
+        Call<OnePhoto> photoCall = activity.instaApiService.getPhoto(code, InstaApiService.A);
+        photoCall.enqueue(new Callback<OnePhoto>() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                comments.remove(comments.size() - 1);
-                aComments.notifyItemRemoved(comments.size());
+            public void onResponse(Call<OnePhoto> call, Response<OnePhoto> response) {
 
-                JSONArray commentsJSON;
-                try {
+                if(response.isSuccessful()) {
+                    Log.d("katyagram", "Api Success");
+
+                    comments.remove(comments.size() - 1);
+                    aComments.notifyItemRemoved(comments.size());
+
+                    photo = response.body().getGraphql().getShortcodeMedia();
+
                     comments.clear();
-                    commentsJSON = response.getJSONObject("media").getJSONObject("comments").getJSONArray("nodes");
-                    int i = commentsJSON.length();
-                    if(i>0) {
-                        i--;
-                        // put newest at the top
-                        for (; i >= 0; i--) {
-                            JSONObject commentJSON = commentsJSON.getJSONObject(i);
-                            Comment comment = new Comment();
-                            comment.fromJSON(commentJSON);
-                            comments.add(comment);
-                        }
-                    }
-
-                    photo = new InstagramPhoto();
-                    photo.fromJSONPhoto(response.getJSONObject("media"));
+                    comments = photo.getEdgeMediaToComment().getEdges();
 
                     // Notified the adapter that it should populate new changes into the listview
                     aComments.notifyDataSetChanged();
                     aComments.setLoaded();
                     updateData();
-                } catch (JSONException e ) {
-                    // Fire if things fail, json parsing is invalid
-                    e.printStackTrace();
+                    swipeContainer.setRefreshing(false);
                 }
-                swipeContainer.setRefreshing(false);
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("katyagram",statusCode + responseString);
+            public void onFailure(Call<OnePhoto> call, Throwable t) {
+                Log.d("katyagram", "Api OnePhoto Failed");
             }
         });
-
     }
 
     class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -301,14 +285,14 @@ public class PhotoController extends Controller{
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
             if (holder instanceof CommentViewHolder) {
-                final Comment comment = comments.get(position);
+                final NodeComments comment = comments.get(position).getNode();
 
 
                 final CommentViewHolder commentViewHolder = (CommentViewHolder) holder;
 
                 Context ctx = commentViewHolder.imgProfile.getContext();
 
-                commentViewHolder.tvComment.setText(comment.username + " " + comment.text);
+                commentViewHolder.tvComment.setText(comment.getOwner().getUsername() + " " + comment.getText());
                 LinkBuilder.on(commentViewHolder.tvComment)
                         .addLink(setupLinkHashtags(ctx, new Link.OnClickListener() {
                             @Override
@@ -331,7 +315,7 @@ public class PhotoController extends Controller{
                                                 .popChangeHandler(new FadeChangeHandler()));
                             }
                         }))
-                        .addLink(setupLinkAuthor(comment.username, ctx, new Link.OnClickListener() {
+                        .addLink(setupLinkAuthor(comment.getOwner().getUsername(), ctx, new Link.OnClickListener() {
                             @Override
                             public void onClick(String clickedText) {
                                 // single clicked
@@ -344,7 +328,7 @@ public class PhotoController extends Controller{
                         .build();
 
                 commentViewHolder.tvCommentTime.setText(
-                        DateUtils.getRelativeTimeSpanString(comment.createdTime*1000,
+                        DateUtils.getRelativeTimeSpanString(comment.getCreatedAt()*1000,
                                 System.currentTimeMillis(),
                                 DateUtils.SECOND_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_RELATIVE));
@@ -354,13 +338,13 @@ public class PhotoController extends Controller{
 
                 // Ask for the photo to be added to the imageview based on the photo url
                 // Background: Send a network request to the url, download the image bytes, convert into bitmap, insert bitmap into the imageview
-                Picasso.with(ctx).load(comment.profileUrl).into(commentViewHolder.imgProfile);
+                Picasso.with(ctx).load(comment.getOwner().getProfilePicUrl()).into(commentViewHolder.imgProfile);
 
                 commentViewHolder.imgProfile.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         getRouter().pushController(
-                                RouterTransaction.with(new PhotosListController(comment.username))
+                                RouterTransaction.with(new PhotosListController(comment.getOwner().getUsername()))
                                         .pushChangeHandler(new FadeChangeHandler())
                                         .popChangeHandler(new FadeChangeHandler()));
                     }
@@ -381,26 +365,22 @@ public class PhotoController extends Controller{
             isLoading = false;
         }
         class CommentViewHolder extends RecyclerView.ViewHolder {
-            public ImageView imgProfile;
-            public TextView tvComment;
-            public TextView  tvCommentTime;
+            @BindView(R.id.imgCommentProfile) ImageView imgProfile;
+            @BindView(R.id.tvComment) TextView tvComment;
+            @BindView(R.id.tvCommentTime) TextView  tvCommentTime;
 
             public CommentViewHolder(View itemView) {
                 super(itemView);
-                // Lookup the subview within the template
-
-                imgProfile = itemView.findViewById(R.id.imgCommentProfile);
-                tvComment = itemView.findViewById(R.id.tvComment);
-                tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
+                ButterKnife.bind(this, itemView);
             }
         }
 
         class LoadingViewHolder extends RecyclerView.ViewHolder {
-            public ProgressBar progressBar;
+            @BindView(R.id.progressBar1) ProgressBar progressBar;
 
             public LoadingViewHolder(View itemView) {
                 super(itemView);
-                progressBar = itemView.findViewById(R.id.progressBar1);
+                ButterKnife.bind(this, itemView);
             }
         }
 
