@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 
-@Data public class ThumbnailResource implements Parcelable
+@Data public class ImageResource implements Parcelable
 {
 
     @Expose
@@ -19,24 +19,24 @@ import lombok.Data;
     @SerializedName("config_height")
     @Expose
     public Integer configHeight;
-    public final static Parcelable.Creator<ThumbnailResource> CREATOR = new Creator<ThumbnailResource>() {
+    public final static Parcelable.Creator<ImageResource> CREATOR = new Creator<ImageResource>() {
 
 
         @SuppressWarnings({
             "unchecked"
         })
-        public ThumbnailResource createFromParcel(Parcel in) {
-            return new ThumbnailResource(in);
+        public ImageResource createFromParcel(Parcel in) {
+            return new ImageResource(in);
         }
 
-        public ThumbnailResource[] newArray(int size) {
-            return (new ThumbnailResource[size]);
+        public ImageResource[] newArray(int size) {
+            return (new ImageResource[size]);
         }
 
     }
     ;
 
-    protected ThumbnailResource(Parcel in) {
+    protected ImageResource(Parcel in) {
         this.src = ((String) in.readValue((String.class.getClassLoader())));
         this.configWidth = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.configHeight = ((Integer) in.readValue((Integer.class.getClassLoader())));

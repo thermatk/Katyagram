@@ -187,7 +187,7 @@ public class HashTagListTopChildController extends Controller{
                 photoViewHolder.imgPhoto.setImageResource(0);
 
                 // Ask for the photo to be added to the imageview based on the photo url
-                Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
+                Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.ic_photo_camera).into(photoViewHolder.imgPhoto);
 
             } else if (holder instanceof LoadingViewHolder) {
                 LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;

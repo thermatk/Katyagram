@@ -9,7 +9,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,9 +28,9 @@ import com.klinker.android.link_builder.LinkBuilder;
 import com.squareup.picasso.Picasso;
 import com.thermatk.android.instaviewer.R;
 import com.thermatk.android.instaviewer.activities.MainActivity;
-import com.thermatk.android.instaviewer.data.InstagramPhoto;
 import com.thermatk.android.instaviewer.data.model.Node;
-import com.thermatk.android.instaviewer.data.model.PhotosList;
+import com.thermatk.android.instaviewer.data.model.request.PhotosList;
+import com.thermatk.android.instaviewer.data.remote.InstaApiService;
 import com.thermatk.android.instaviewer.interfaces.ILoadMore;
 
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
-import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkAuthor;
 import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkHashtags;
 import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkMentions;
 
@@ -86,6 +84,7 @@ public class PhotosListController extends Controller{
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                maxId = "";
                 fetchPhotos();
             }
         });
@@ -145,7 +144,7 @@ public class PhotosListController extends Controller{
         photosNodes.add(null);
         aPhotos.notifyItemInserted(photosNodes.size() - 1);
 
-        Call<PhotosList> photosListCall = activity.instaApiService.getPhotosList(user,maxId,1);
+        Call<PhotosList> photosListCall = activity.instaApiService.getPhotosList(user,maxId,InstaApiService.A);
         photosListCall.enqueue(new Callback<PhotosList>() {
             @Override
             public void onResponse(Call<PhotosList> call, Response<PhotosList> response) {
@@ -156,14 +155,11 @@ public class PhotosListController extends Controller{
                     moreAvailable = photosList.getUser().getMedia().getPageInfo().getHasNextPage();
                     maxId = photosList.getUser().getMedia().getPageInfo().getEndCursor();
 
-
                     photosNodes.remove(photosNodes.size() - 1);
                     aPhotos.notifyItemRemoved(photosNodes.size());
 
-
                     photosNodes = photosList.getUser().getMedia().getNodes();
 
-                    // notify adapter
                     if(photosNodes.size() == 0) {
                         Log.d("katyagram", "Private profile");
                         Toast.makeText(getApplicationContext(),
@@ -171,6 +167,7 @@ public class PhotosListController extends Controller{
                         getRouter().handleBack();
                     }
 
+                    // notify adapter
                     aPhotos.notifyDataSetChanged();
                     aPhotos.setLoaded();
 
@@ -187,7 +184,7 @@ public class PhotosListController extends Controller{
 
     private void fetchMorePhotos() {
 
-        Call<PhotosList> photosListCall = activity.instaApiService.getPhotosList(user,maxId,1);
+        Call<PhotosList> photosListCall = activity.instaApiService.getPhotosList(user,maxId, InstaApiService.A);
         photosListCall.enqueue(new Callback<PhotosList>() {
             @Override
             public void onResponse(Call<PhotosList> call, Response<PhotosList> response) {
@@ -223,7 +220,7 @@ public class PhotosListController extends Controller{
         private ILoadMore mOnLoadMoreListener;
 
         private boolean isLoading;
-        private int visibleThreshold = 5;
+        private final int visibleThreshold = 5;
         private int lastVisibleItem, totalItemCount;
         private final LayoutInflater inflater;
 
@@ -277,8 +274,6 @@ public class PhotosListController extends Controller{
 
                 final PhotoViewHolder photoViewHolder = (PhotoViewHolder) holder;
 
-
-                // Populate the subviews (textfield, imageview) with the correct data
                 photoViewHolder.tvUsername.setText(photosList.getUser().getUsername());
 
                 Context ctx = photoViewHolder.tvCaption.getContext();
@@ -338,24 +333,24 @@ public class PhotosListController extends Controller{
                     photoViewHolder.tvViewAllComments.setVisibility(View.GONE);
                 }
 
-                // use device width for photo height
-                DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
-                photoViewHolder.imgPhoto.getLayoutParams().height = displayMetrics.widthPixels;
-
                 // Reset the images from the recycled view
                 photoViewHolder.imgProfile.setImageResource(0);
                 photoViewHolder.imgPhoto.setImageResource(0);
 
-                // Ask for the photo to be added to the imageview based on the photo url
-                // Background: Send a network request to the url, download the image bytes, convert into bitmap, insert bitmap into the imageview
                 Picasso.with(ctx).load(photosList.getUser().getProfilePicUrlHd()).into(photoViewHolder.imgProfile);
                 // show overlay if a video
-                if (photo.isVideo == true) {
+                if (photo.isVideo) {
                     photoViewHolder.imgPhotoPlay.setVisibility(View.VISIBLE);
+                } else if(photo.getTypename().contains("Sidecar")) {
+                    photoViewHolder.imgPhotoPlay.setVisibility(View.VISIBLE);
+                    photoViewHolder.imgPhotoPlay.setImageDrawable(ctx.getDrawable(R.drawable.ic_collections));
+                    Log.d("katyagram","A sidecar!");
                 } else {
                     photoViewHolder.imgPhotoPlay.setVisibility(View.GONE);
                 }
-                Picasso.with(ctx).load(photo.getDisplaySrc()).placeholder(R.drawable.instagram_glyph_on_white).into(photoViewHolder.imgPhoto);
+                Picasso.with(ctx).load(photo.getDisplaySrc())
+                        .placeholder(R.drawable.ic_photo_camera)
+                        .into(photoViewHolder.imgPhoto);
                 photoViewHolder.imgPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -396,37 +391,27 @@ public class PhotosListController extends Controller{
         }
 
         class PhotoViewHolder extends RecyclerView.ViewHolder {
-            public ImageView imgProfile;
-            public ImageView imgPhoto;
-            public TextView tvUsername;
-            public TextView tvTime;
-            public TextView tvLikes;
-            public TextView tvCaption;
-            public TextView tvViewAllComments;
-
-            public ImageView imgPhotoPlay;
+            @BindView(R.id.imgProfile) ImageView imgProfile;
+            @BindView(R.id.imgPhoto) ImageView imgPhoto;
+            @BindView(R.id.tvUsername) TextView tvUsername;
+            @BindView(R.id.tvTime) TextView tvTime;
+            @BindView(R.id.tvLikes) TextView tvLikes;
+            @BindView(R.id.tvCaption) TextView tvCaption;
+            @BindView(R.id.tvViewAllComments) TextView tvViewAllComments;
+            @BindView(R.id.imgPhotoPlay) ImageView imgPhotoPlay;
 
             public PhotoViewHolder(View itemView) {
                 super(itemView);
-                // Lookup the subview within the template
-                imgProfile = itemView.findViewById(R.id.imgProfile);
-                imgPhoto = itemView.findViewById(R.id.imgPhoto);
-                tvUsername = itemView.findViewById(R.id.tvUsername);
-                tvTime = itemView.findViewById(R.id.tvTime);
-                tvLikes = itemView.findViewById(R.id.tvLikes);
-                tvCaption = itemView.findViewById(R.id.tvCaption);
-                tvViewAllComments = itemView.findViewById(R.id.tvViewAllComments);
-
-                imgPhotoPlay = itemView.findViewById(R.id.imgPhotoPlay);
+                ButterKnife.bind(this, itemView);
             }
         }
 
         class LoadingViewHolder extends RecyclerView.ViewHolder {
-            public ProgressBar progressBar;
+            @BindView(R.id.progressBar1) ProgressBar progressBar;
 
             public LoadingViewHolder(View itemView) {
                 super(itemView);
-                progressBar = itemView.findViewById(R.id.progressBar1);
+                ButterKnife.bind(this, itemView);
             }
         }
 

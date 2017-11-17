@@ -27,12 +27,12 @@ import lombok.Data;
     public Object externalUrlLinkshimmed;
     @SerializedName("followed_by")
     @Expose
-    public FollowedBy followedBy;
+    public Counter followedBy;
     @SerializedName("followed_by_viewer")
     @Expose
     public Boolean followedByViewer;
     @Expose
-    public Follows follows;
+    public Counter follows;
     @SerializedName("follows_viewer")
     @Expose
     public Boolean followsViewer;
@@ -92,9 +92,9 @@ import lombok.Data;
         this.countryBlock = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.externalUrl = ((Object) in.readValue((Object.class.getClassLoader())));
         this.externalUrlLinkshimmed = ((Object) in.readValue((Object.class.getClassLoader())));
-        this.followedBy = ((FollowedBy) in.readValue((FollowedBy.class.getClassLoader())));
+        this.followedBy = ((Counter) in.readValue((Counter.class.getClassLoader())));
         this.followedByViewer = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-        this.follows = ((Follows) in.readValue((Follows.class.getClassLoader())));
+        this.follows = ((Counter) in.readValue((Counter.class.getClassLoader())));
         this.followsViewer = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.fullName = ((String) in.readValue((String.class.getClassLoader())));
         this.hasBlockedViewer = ((Boolean) in.readValue((Boolean.class.getClassLoader())));

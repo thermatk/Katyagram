@@ -213,7 +213,7 @@ public class PhotoController extends Controller{
         // Ask for the photo to be added to the imageview based on the photo url
         // Background: Send a network request to the url, download the image bytes, convert into bitmap, insert bitmap into the imageview
         Picasso.with(ctx).load(photo.profileUrl).into(imgProfileAuthor);
-        Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.instagram_glyph_on_white).into(imgPhoto);
+        Picasso.with(ctx).load(photo.imageUrl).placeholder(R.drawable.ic_photo_camera).into(imgPhoto);
 
     }
 

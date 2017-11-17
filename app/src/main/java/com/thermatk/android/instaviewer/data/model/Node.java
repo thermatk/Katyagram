@@ -22,9 +22,6 @@ import lombok.Data;
     public Boolean commentsDisabled;
     @Expose
     public Dimensions dimensions;
-    @SerializedName("gating_info")
-    @Expose
-    public Object gatingInfo;
     @SerializedName("media_preview")
     @Expose
     public String mediaPreview;
@@ -35,23 +32,23 @@ import lombok.Data;
     public String thumbnailSrc;
     @SerializedName("thumbnail_resources")
     @Expose
-    public List<ThumbnailResource> thumbnailResources = null;
+    public List<ImageResource> thumbnailResources = null;
     @SerializedName("is_video")
     @Expose
     public Boolean isVideo;
     @Expose
     public String code;
     @Expose
-    public Integer date;
+    public long date;
     @SerializedName("display_src")
     @Expose
     public String displaySrc;
     @Expose
     public String caption;
     @Expose
-    public Comments comments;
+    public Counter comments;
     @Expose
-    public Likes likes;
+    public Counter likes;
     public final static Parcelable.Creator<Node> CREATOR = new Creator<Node>() {
 
 
@@ -74,18 +71,17 @@ import lombok.Data;
         this.id = ((String) in.readValue((String.class.getClassLoader())));
         this.commentsDisabled = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.dimensions = ((Dimensions) in.readValue((Dimensions.class.getClassLoader())));
-        this.gatingInfo = ((Object) in.readValue((Object.class.getClassLoader())));
         this.mediaPreview = ((String) in.readValue((String.class.getClassLoader())));
         this.owner = ((Owner) in.readValue((Owner.class.getClassLoader())));
         this.thumbnailSrc = ((String) in.readValue((String.class.getClassLoader())));
-        in.readList(this.thumbnailResources, (com.thermatk.android.instaviewer.data.model.ThumbnailResource.class.getClassLoader()));
+        in.readList(this.thumbnailResources, (ImageResource.class.getClassLoader()));
         this.isVideo = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.code = ((String) in.readValue((String.class.getClassLoader())));
-        this.date = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.date = ((long) in.readValue((Integer.class.getClassLoader())));
         this.displaySrc = ((String) in.readValue((String.class.getClassLoader())));
         this.caption = ((String) in.readValue((String.class.getClassLoader())));
-        this.comments = ((Comments) in.readValue((Comments.class.getClassLoader())));
-        this.likes = ((Likes) in.readValue((Likes.class.getClassLoader())));
+        this.comments = ((Counter) in.readValue((Counter.class.getClassLoader())));
+        this.likes = ((Counter) in.readValue((Counter.class.getClassLoader())));
     }
 
     public void writeToParcel(Parcel dest, int flags) {
@@ -93,7 +89,6 @@ import lombok.Data;
         dest.writeValue(id);
         dest.writeValue(commentsDisabled);
         dest.writeValue(dimensions);
-        dest.writeValue(gatingInfo);
         dest.writeValue(mediaPreview);
         dest.writeValue(owner);
         dest.writeValue(thumbnailSrc);

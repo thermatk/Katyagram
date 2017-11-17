@@ -4,33 +4,32 @@ package com.thermatk.android.instaviewer.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 
-@Data public class Follows implements Parcelable
+@Data public class Counter implements Parcelable
 {
 
     @Expose
     public Integer count;
-    public final static Parcelable.Creator<Follows> CREATOR = new Creator<Follows>() {
+    public final static Parcelable.Creator<Counter> CREATOR = new Creator<Counter>() {
 
 
         @SuppressWarnings({
             "unchecked"
         })
-        public Follows createFromParcel(Parcel in) {
-            return new Follows(in);
+        public Counter createFromParcel(Parcel in) {
+            return new Counter(in);
         }
 
-        public Follows[] newArray(int size) {
-            return (new Follows[size]);
+        public Counter[] newArray(int size) {
+            return (new Counter[size]);
         }
 
     }
     ;
 
-    protected Follows(Parcel in) {
+    protected Counter(Parcel in) {
         this.count = ((Integer) in.readValue((Integer.class.getClassLoader())));
     }
 

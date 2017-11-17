@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bluelinelabs.conductor.Conductor;
 import com.bluelinelabs.conductor.Router;
@@ -19,6 +20,7 @@ import com.thermatk.android.instaviewer.data.remote.InstaApiService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,17 +41,15 @@ public class MainActivity extends AppCompatActivity {
 
         new DrawerBuilder().withActivity(this).build();
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Click action
-            }
-        });
-
         if (!router.hasRootController()) {
             router.setRoot(RouterTransaction.with(new EntryController("")));
         }
 
+    }
+
+    @OnClick(R.id.fab)
+    public void fabClicked() {
+        Toast.makeText(this,"Clicked FAB, test", Toast.LENGTH_SHORT).show();
     }
 
     @Override

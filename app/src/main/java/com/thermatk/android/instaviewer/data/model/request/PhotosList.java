@@ -1,10 +1,11 @@
 
-package com.thermatk.android.instaviewer.data.model;
+package com.thermatk.android.instaviewer.data.model.request;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.thermatk.android.instaviewer.data.model.User;
 
 import lombok.Data;
 
