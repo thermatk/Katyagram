@@ -14,40 +14,38 @@ import com.bluelinelabs.conductor.RouterTransaction;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.thermatk.android.instaviewer.R;
 import com.thermatk.android.instaviewer.controllers.EntryController;
-import com.thermatk.android.instaviewer.persist.FollowUser;
+import com.thermatk.android.instaviewer.data.remote.ApiClient;
+import com.thermatk.android.instaviewer.data.remote.InstaApiService;
 
-import static com.thermatk.android.instaviewer.persist.PreferenceHelper.readFollowUsers;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
     private Router router;
-    public ViewGroup container;
-    public FollowUser[] users;
+    @BindView(R.id.controller_container) ViewGroup container;
+    @BindView(R.id.fab) FloatingActionButton fab;
+
+    public InstaApiService instaApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        container = findViewById(R.id.controller_container);
+        ButterKnife.bind(this);
+        instaApiService = ApiClient.getAPIService();
 
         router = Conductor.attachRouter(this, container, savedInstanceState);
 
-        users = readFollowUsers(getApplicationContext());
-        if(users != null) {
-            Log.d("katyagram", "Loaded followusers: " + users.length);
-        }
-
-
         new DrawerBuilder().withActivity(this).build();
-        FloatingActionButton fab = findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Click action
             }
         });
+
         if (!router.hasRootController()) {
             router.setRoot(RouterTransaction.with(new EntryController("")));
         }

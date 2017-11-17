@@ -39,6 +39,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import cz.msebera.android.httpclient.Header;
 
 import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
@@ -47,10 +50,12 @@ import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkHash
 import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkMentions;
 
 public class PhotosListController extends Controller{
+    private Unbinder unbinder;
+    @BindView(R.id.lvPhotos) RecyclerView mRecyclerView;
+    @BindView(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
+
     private ArrayList<InstagramPhoto> photos;
     private PhotosAdapter aPhotos;
-    private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout swipeContainer;
     private boolean moreAvailable;
     private final static String BUNDLE_KEY = "user";
     private String user;
@@ -66,10 +71,10 @@ public class PhotosListController extends Controller{
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.controller_list, container, false);
+        unbinder = ButterKnife.bind(this, view);
         Context ctx = view.getContext();
 
         user = getArgs().getString("user");
-        swipeContainer = view.findViewById(R.id.swipeContainer);
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -85,8 +90,6 @@ public class PhotosListController extends Controller{
 
         photos = new ArrayList<>();
 
-
-        mRecyclerView = view.findViewById(R.id.lvPhotos);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
 
         aPhotos = new PhotosAdapter(LayoutInflater.from(ctx));
@@ -112,6 +115,14 @@ public class PhotosListController extends Controller{
 
         fetchPhotosInitial();
         return view;
+    }
+
+
+    @Override
+    protected void onDestroyView(@NonNull View view) {
+        super.onDestroyView(view);
+        unbinder.unbind();
+        unbinder = null;
     }
 
     @Override
@@ -167,7 +178,7 @@ public class PhotosListController extends Controller{
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.d("katyagram",statusCode + responseString);
+                //Log.d("katyagram",statusCode + responseString);
             }
         });
 
@@ -177,7 +188,7 @@ public class PhotosListController extends Controller{
 
         // do the network request
         String popularUrl = "https://www.instagram.com/" +user+ "/media/?max_id="+maxId;
-        Log.d("katyagram" , popularUrl);
+        Log.d("katyagram" , "MORE" + popularUrl);
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(popularUrl, new JsonHttpResponseHandler() {
             // define success and failure callbacks

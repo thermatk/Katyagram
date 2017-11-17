@@ -9,6 +9,12 @@ android {
         targetSdkVersion 26
         versionCode 2
         versionName "2.0"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
     }
 
     dexOptions {
@@ -17,8 +23,9 @@ android {
 
     buildTypes {
         release {
-            shrinkResources true
-            minifyEnabled true
+            //shrinkResources true
+            //minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -36,6 +43,8 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:26.1.0"
     implementation "com.android.support:support-annotations:26.1.0"
 
+    compileOnly "org.projectlombok:lombok:1.16.18"
+
     implementation('com.mikepenz:materialdrawer:6.0.1@aar') {
         transitive = true
     }
@@ -47,12 +56,17 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.2'
 
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     implementation 'com.loopj.android:android-async-http:1.4.9'
+
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     // https://github.com/wasabeef/glide-transformations
     implementation 'com.makeramen:roundedimageview:1.5.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
-
 
     implementation 'com.google.android.exoplayer:exoplayer:r2.2.0'
 }

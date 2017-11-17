@@ -23,13 +23,20 @@ import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.mikepenz.materialdrawer.util.KeyboardUtil;
 import com.thermatk.android.instaviewer.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
 
 public class EntryController extends Controller{
+    private Unbinder unbinder;
+    @BindView(R.id.username) TextInputEditText mUsernameView;
+    @BindView(R.id.go_button) Button mSearchButton;
+
     private final static String BUNDLE_KEY = "code";
     private String code;
 
-    private TextInputEditText mUsernameView;
     public EntryController(@Nullable Bundle args) {
         super(args);
     }
@@ -41,24 +48,21 @@ public class EntryController extends Controller{
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.controller_entry, container, false);
-        Context ctx = view.getContext();
+        unbinder = ButterKnife.bind(this, view);
 
         code = getArgs().getString(BUNDLE_KEY);
-
-        mUsernameView = view.findViewById(R.id.username);
 
         mUsernameView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.searchuser || id == EditorInfo.IME_NULL) {
                     goToUser();
-                    return true;
+                    return false;
                 }
                 return false;
             }
         });
 
-        Button mSearchButton = view.findViewById(R.id.go_button);
         mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,6 +71,13 @@ public class EntryController extends Controller{
         });
         //
         return view;
+    }
+
+    @Override
+    protected void onDestroyView(@NonNull View view) {
+        super.onDestroyView(view);
+        unbinder.unbind();
+        unbinder = null;
     }
 
     private void goToUser() {
@@ -108,6 +119,7 @@ public class EntryController extends Controller{
         //TODO: Do the logic
         return true;
     }
+
     @Override
     protected void onChangeStarted(@NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
         setOptionsMenuHidden(!changeType.isEnter);
