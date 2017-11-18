@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -289,7 +288,6 @@ public class PhotosListController extends Controller{
                 photoViewHolder.tvLikes.setText(likesCaption);
                 if (photo.caption != null) {
                     photoViewHolder.tvCaption.setText(photo.caption);
-
 
                     LinkBuilder.on(photoViewHolder.tvCaption)
                             .addLink(setupLinkHashtags(ctx,new Link.OnClickListener() {
