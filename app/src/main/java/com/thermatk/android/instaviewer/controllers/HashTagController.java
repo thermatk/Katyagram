@@ -13,18 +13,25 @@ import android.view.ViewGroup;
 import com.bluelinelabs.conductor.Controller;
 import com.bluelinelabs.conductor.ControllerChangeHandler;
 import com.bluelinelabs.conductor.ControllerChangeType;
-// https://github.com/bluelinelabs/Conductor/commit/a9bdf0dd06b5f2e0fd6a980cb0e86eb737cef457#diff-1219f1e886a4472258ed9221b8ccf78a
 import com.bluelinelabs.conductor.Router;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.support.RouterPagerAdapter;
 import com.thermatk.android.instaviewer.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
 
 public class HashTagController extends Controller {
+    private Unbinder unbinder;
+    @BindView(R.id.view_pager) ViewPager viewPager;
+    @BindView(R.id.tab_layout) TabLayout tabLayout;
+
     private String tag;
     private final static String BUNDLE_KEY = "tag";
-    private ViewPager viewPager;
+
     private final RouterPagerAdapter pagerAdapter;
 
     public HashTagController(@Nullable Bundle args) {
@@ -73,10 +80,9 @@ public class HashTagController extends Controller {
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.controller_hashtag_pager, container, false);
+        unbinder = ButterKnife.bind(this, view);
         tag = getArgs().getString(BUNDLE_KEY);
 
-        TabLayout tabLayout = view.findViewById(R.id.tab_layout);
-        viewPager = view.findViewById(R.id.view_pager);
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -87,6 +93,8 @@ public class HashTagController extends Controller {
     protected void onDestroyView(@NonNull View view) {
         viewPager.setAdapter(null);
         super.onDestroyView(view);
+        unbinder.unbind();
+        unbinder = null;
     }
 
     @Override

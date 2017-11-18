@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,14 +53,13 @@ public class PhotosListController extends Controller{
     @BindView(R.id.lvPhotos) RecyclerView mRecyclerView;
     @BindView(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
 
-    private final static String BUNDLE_KEY = "user";
-
     private MainActivity activity;
 
     private PhotosList photosList;
     private List<Node> photosNodes;
     private PhotosAdapter aPhotos;
     private boolean moreAvailable;
+    private final static String BUNDLE_KEY = "user";
     private String user;
     private String maxId;
 
@@ -124,6 +124,7 @@ public class PhotosListController extends Controller{
         return view;
     }
 
+
     @Override
     protected void onDestroyView(@NonNull View view) {
         super.onDestroyView(view);
@@ -136,7 +137,8 @@ public class PhotosListController extends Controller{
         setOptionsMenuHidden(!changeType.isEnter);
 
         if (changeType.isEnter) {
-            Log.d("katyagram", "first opening");
+            activity.fabUpBindRecyclerView(mRecyclerView);
+            Log.d("katyagram", "opening");
         }
     }
 
@@ -283,9 +285,11 @@ public class PhotosListController extends Controller{
                                 System.currentTimeMillis(),
                                 DateUtils.MINUTE_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_RELATIVE));
-                photoViewHolder.tvLikes.setText(String.format("\uD83D\uDC96: %d", photo.getLikes().getCount()));
+                String likesCaption = String.format("\uD83D\uDC96: %d", photo.getLikes().getCount());
+                photoViewHolder.tvLikes.setText(likesCaption);
                 if (photo.caption != null) {
                     photoViewHolder.tvCaption.setText(photo.caption);
+
 
                     LinkBuilder.on(photoViewHolder.tvCaption)
                             .addLink(setupLinkHashtags(ctx,new Link.OnClickListener() {
@@ -310,13 +314,15 @@ public class PhotosListController extends Controller{
                                 }
                             }))
                             .build();
+                    Log.d("katyagram", "Caption " + photoViewHolder.tvCaption.getText());
                     photoViewHolder.tvCaption.setVisibility(View.VISIBLE);
                 } else {
                     photoViewHolder.tvCaption.setVisibility(View.GONE);
                 }
                 final int curPos = position;
                 if (photo.getComments().getCount() > 0) {
-                    photoViewHolder.tvViewAllComments.setText(String.format("\uD83D\uDCAD (%d)", photo.getComments().getCount()));
+                    String commentCaption = String.format("\uD83D\uDCAD (%d)", photo.getComments().getCount());
+                    photoViewHolder.tvViewAllComments.setText(commentCaption);
                     // set click handler for view all comments
                     photoViewHolder.tvViewAllComments.setOnClickListener(new View.OnClickListener() {
                         @Override

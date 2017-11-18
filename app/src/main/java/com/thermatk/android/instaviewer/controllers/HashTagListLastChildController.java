@@ -34,18 +34,24 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import cz.msebera.android.httpclient.Header;
 
 import static com.thermatk.android.instaviewer.utils.BuildBundle.createBundleWithString;
 
 public class HashTagListLastChildController extends Controller{
+    private Unbinder unbinder;
+    @BindView(R.id.lvPhotos) RecyclerView mRecyclerView;
+    @BindView(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
+
+    private final static String BUNDLE_KEY = "tag";
+
     private ArrayList<InstagramPhoto> photos;
     private HashTagLastAdapter aPhotos;
-    private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout swipeContainer;
     private boolean moreAvailable;
     private String endId;
-    private final static String BUNDLE_KEY = "tag";
     private String tag;
 
     public HashTagListLastChildController(@Nullable Bundle args) {
@@ -59,10 +65,10 @@ public class HashTagListLastChildController extends Controller{
     @Override
     protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = inflater.inflate(R.layout.controller_list, container, false);
+        unbinder = ButterKnife.bind(this, view);
         Context ctx = view.getContext();
 
         tag = getArgs().getString("tag");
-        swipeContainer = view.findViewById(R.id.swipeContainer);
 
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -78,8 +84,6 @@ public class HashTagListLastChildController extends Controller{
 
         photos = new ArrayList<>();
 
-
-        mRecyclerView = view.findViewById(R.id.lvPhotos);
         mRecyclerView.setLayoutManager(new GridLayoutManager(ctx, 2));
 
         aPhotos = new HashTagLastAdapter(LayoutInflater.from(ctx));
@@ -106,6 +110,13 @@ public class HashTagListLastChildController extends Controller{
 
         fetchPhotosInitial();
         return view;
+    }
+
+    @Override
+    protected void onDestroyView(@NonNull View view) {
+        super.onDestroyView(view);
+        unbinder.unbind();
+        unbinder = null;
     }
 
     @Override
@@ -286,22 +297,22 @@ public class HashTagListLastChildController extends Controller{
         public void setLoaded() {
             isLoading = false;
         }
+
         class PhotoViewHolder extends RecyclerView.ViewHolder {
-            public ImageView imgPhoto;
+            @BindView(R.id.imgPhoto) ImageView imgPhoto;
 
             public PhotoViewHolder(View itemView) {
                 super(itemView);
-                // Lookup the subview within the template
-                imgPhoto = itemView.findViewById(R.id.imgPhoto);
+                ButterKnife.bind(this, itemView);
             }
         }
 
         class LoadingViewHolder extends RecyclerView.ViewHolder {
-            public ProgressBar progressBar;
+            @BindView(R.id.progressBar1) ProgressBar progressBar;
 
             public LoadingViewHolder(View itemView) {
                 super(itemView);
-                progressBar = itemView.findViewById(R.id.progressBar1);
+                ButterKnife.bind(this, itemView);
             }
         }
 
@@ -320,5 +331,4 @@ public class HashTagListLastChildController extends Controller{
         }
 
     }
-
 }

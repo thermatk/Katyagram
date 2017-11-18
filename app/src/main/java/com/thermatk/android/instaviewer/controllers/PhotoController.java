@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,6 +51,7 @@ import static com.thermatk.android.instaviewer.utils.TextViewLinks.setupLinkMent
 public class PhotoController extends Controller{
     private Unbinder unbinder;
     @BindView(R.id.lvComments) RecyclerView mRecyclerView;
+    @BindView(R.id.nestedScroll) NestedScrollView nestedScrollView;
     @BindView(R.id.swipeContainer) SwipeRefreshLayout swipeContainer;
     @BindView(R.id.imgProfile) ImageView imgProfileAuthor;
     @BindView(R.id.imgPhoto) ImageView imgPhoto;
@@ -63,7 +65,6 @@ public class PhotoController extends Controller{
 
     private MainActivity activity;
 
-    private OnePhoto onePhoto;
     private ShortcodeMedia photo;
 
     private List<EdgeComments> comments;
@@ -101,8 +102,13 @@ public class PhotoController extends Controller{
                 android.R.color.holo_red_light);
 
         comments = new ArrayList<>();
-
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(ctx));
+        RecyclerView.LayoutManager layoutManager = new  LinearLayoutManager(ctx) {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
+        mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setNestedScrollingEnabled(false);
         mRecyclerView.setFocusable(false);
 
@@ -127,6 +133,7 @@ public class PhotoController extends Controller{
         setOptionsMenuHidden(!changeType.isEnter);
 
         if (changeType.isEnter) {
+            activity.fabUpBindNestedScrollView(nestedScrollView);
             Log.d("katyagram", "first opening");
         }
     }
